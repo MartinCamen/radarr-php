@@ -1,0 +1,64 @@
+{
+  "name": "martincamen/radarr-php",
+  "description": "PHP SDK for Radarr REST API v3",
+  "keywords": [
+    "radarr",
+    "movies",
+    "api",
+    "sdk",
+    "media-server"
+  ],
+  "homepage": "https://github.com/martincamen/radarr-php",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Martin Camen",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.3",
+    "guzzlehttp/guzzle": "^7.0",
+    "illuminate/collections": "^12.0",
+    "martincamen/php-arr-core": "^0.0.1"
+  },
+  "require-dev": {
+    "laravel/pint": "^1.0",
+    "phpstan/phpstan": "^2.0",
+    "phpunit/phpunit": "^12.0",
+    "rector/rector": "^2.2",
+    "roave/security-advisories": "dev-latest"
+  },
+  "autoload": {
+    "psr-4": {
+      "MartinCamen\\Radarr\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "MartinCamen\\Radarr\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "pint": "vendor/bin/pint --test",
+    "pint-fix": "vendor/bin/pint",
+    "analyse": "vendor/bin/phpstan analyse",
+    "test": "vendor/bin/phpunit",
+    "rector": "vendor/bin/rector process --dry-run",
+    "rector-fix": "vendor/bin/rector process",
+    "check": [
+      "@analyse",
+      "@test",
+      "@pint",
+      "@rector"
+    ]
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "phpstan/extension-installer": true
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
