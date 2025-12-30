@@ -5,7 +5,6 @@ A PHP SDK for the Radarr REST API v3.
 ## Requirements
 
 - PHP 8.3+
-- Laravel 10.0+, 11.0+ or 12.0+
 
 ## Installation
 
