@@ -12,9 +12,17 @@ use MartinCamen\Radarr\Actions\MovieActions;
 use MartinCamen\Radarr\Actions\QueueActions;
 use MartinCamen\Radarr\Actions\SystemActions;
 use MartinCamen\Radarr\Actions\WantedActions;
-use MartinCamen\Radarr\RadarrInterface;
+use MartinCamen\Radarr\Client\RadarrApiClientInterface;
 
-class RadarrApiFake extends BaseApiFake implements RadarrInterface
+/**
+ * Fake implementation for the low-level Radarr API client.
+ *
+ * Use this when you need to test code that interacts directly
+ * with the API client layer.
+ *
+ * @internal
+ */
+class RadarrApiFake extends BaseApiFake implements RadarrApiClientInterface
 {
     public function movie(): MovieActions
     {

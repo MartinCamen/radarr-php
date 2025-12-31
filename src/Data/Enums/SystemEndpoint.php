@@ -19,12 +19,12 @@ enum SystemEndpoint: string implements Endpoint
     public function defaultResponse(): mixed
     {
         return match ($this) {
-            self::Status    => [],
-            self::Health    => [],
-            self::DiskSpace => [],
-            self::Task      => [],
-            self::TaskById  => [],
-            self::Backup    => [],
+            self::Status,
+            self::Task,
+            self::DiskSpace,
+            self::Backup,
+            self::TaskById,
+            self::Health => [],
         };
     }
 }

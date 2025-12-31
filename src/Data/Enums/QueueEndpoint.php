@@ -18,11 +18,9 @@ enum QueueEndpoint: string implements Endpoint
     public function defaultResponse(): mixed
     {
         return match ($this) {
-            self::All     => ['page' => 1, 'pageSize' => 10, 'totalRecords' => 0, 'records' => []],
-            self::ById    => null,
-            self::Details => [],
-            self::Status  => [],
-            self::Bulk    => null,
+            self::All                   => ['page' => 1, 'pageSize' => 10, 'totalRecords' => 0, 'records' => []],
+            self::ById, self::Bulk      => null,
+            self::Details, self::Status => [],
         };
     }
 }

@@ -69,7 +69,7 @@ final class HistoryPage extends PaginatedResponse implements Countable, Iterator
             'page_size'     => $this->pageSize,
             'total_records' => $this->totalRecords,
             'records'       => array_map(
-                fn(HistoryRecord $record): array => $record->toArray(),
+                static fn(HistoryRecord $record): array => $record->toArray(),
                 $this->records,
             ),
         ];
