@@ -15,8 +15,7 @@ enum CommandEndpoint: string implements Endpoint
     public function defaultResponse(): mixed
     {
         return match ($this) {
-            self::All  => [],
-            self::ById => [],
+            self::All, self::ById => [],
         };
     }
 }

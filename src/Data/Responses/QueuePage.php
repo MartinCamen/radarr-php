@@ -69,7 +69,7 @@ final class QueuePage extends PaginatedResponse implements Countable, IteratorAg
             'page_size'     => $this->pageSize,
             'total_records' => $this->totalRecords,
             'records'       => array_map(
-                fn(QueueRecord $record): array => $record->toArray(),
+                static fn(QueueRecord $record): array => $record->toArray(),
                 $this->records,
             ),
         ];

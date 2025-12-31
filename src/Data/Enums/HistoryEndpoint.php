@@ -17,9 +17,9 @@ enum HistoryEndpoint: string implements Endpoint
     public function defaultResponse(): mixed
     {
         return match ($this) {
-            self::All => ['page' => 1, 'pageSize' => 10, 'totalRecords' => 0, 'records' => []],
+            self::All                => ['page' => 1, 'pageSize' => 10, 'totalRecords' => 0, 'records' => []],
             self::Since, self::Movie => [],
-            self::Failed => null,
+            self::Failed             => null,
         };
     }
 }

@@ -18,8 +18,7 @@ enum MovieEndpoint: string implements Endpoint
     public function defaultResponse(): mixed
     {
         return match ($this) {
-            self::All, self::Lookup, self::LookupTmdb, self::LookupImdb => [],
-            self::ById => [],
+            self::All, self::Lookup, self::LookupTmdb, self::LookupImdb, self::ById => [],
         };
     }
 }

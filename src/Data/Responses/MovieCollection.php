@@ -71,7 +71,7 @@ final class MovieCollection implements Countable, IteratorAggregate
     public function toArray(): array
     {
         return array_map(
-            fn(Movie $movie): array => $movie->toArray(),
+            static fn(Movie $movie): array => $movie->toArray(),
             $this->movies,
         );
     }
@@ -81,7 +81,7 @@ final class MovieCollection implements Countable, IteratorAggregate
         return new self(
             array_values(array_filter(
                 $this->movies,
-                fn(Movie $movie): bool => $movie->isMonitored(),
+                static fn(Movie $movie): bool => $movie->isMonitored(),
             )),
         );
     }
@@ -91,7 +91,7 @@ final class MovieCollection implements Countable, IteratorAggregate
         return new self(
             array_values(array_filter(
                 $this->movies,
-                fn(Movie $movie): bool => $movie->isDownloaded(),
+                static fn(Movie $movie): bool => $movie->isDownloaded(),
             )),
         );
     }
@@ -101,7 +101,7 @@ final class MovieCollection implements Countable, IteratorAggregate
         return new self(
             array_values(array_filter(
                 $this->movies,
-                fn(Movie $movie): bool => ! $movie->isDownloaded() && $movie->isMonitored(),
+                static fn(Movie $movie): bool => ! $movie->isDownloaded() && $movie->isMonitored(),
             )),
         );
     }

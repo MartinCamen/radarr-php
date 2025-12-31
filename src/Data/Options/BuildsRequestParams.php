@@ -2,6 +2,7 @@
 
 namespace MartinCamen\Radarr\Data\Options;
 
+use BackedEnum;
 use DateTimeInterface;
 
 trait BuildsRequestParams
@@ -50,7 +51,7 @@ trait BuildsRequestParams
      */
     protected function addEnumIfNotNull(array &$params, string $key, mixed $value): void
     {
-        if ($value !== null && $value instanceof \BackedEnum) {
+        if ($value instanceof BackedEnum) {
             $params[$key] = $value->value;
         }
     }
