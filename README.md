@@ -112,17 +112,19 @@ use MartinCamen\Radarr\Data\Options\CalendarOptions;
 $calendar = $radarr->calendar()->get();
 
 // Get movies within a specific date range
-$options = CalendarOptions::default()
+$options = CalendarOptions::make()
     ->withDateRange(
         new DateTime('2024-01-01'),
         new DateTime('2024-01-31'),
     );
+
 $movies = $radarr->calendar()->get($options);
 
 // Include unmonitored movies and filter by tags
-$options = CalendarOptions::default()
+$options = CalendarOptions::make()
     ->withUnmonitored(true)
     ->withTags([1, 2]);
+
 $movies = $radarr->calendar()->get($options);
 ```
 
@@ -145,7 +147,7 @@ $sort = SortOptions::by('date')->descending();
 $history = $radarr->history()->all($pagination, $sort);
 
 // Filter by event type
-$filters = HistoryOptions::default()
+$filters = HistoryOptions::make()
     ->withEventType(HistoryEventType::Grabbed)
     ->withIncludeMovie(true);
 $history = $radarr->history()->all(null, null, $filters);
@@ -165,7 +167,7 @@ use MartinCamen\ArrCore\Data\Options\WantedOptions;
 $missing = $radarr->wanted()->missing();
 
 // Filter to only monitored movies
-$filters = WantedOptions::default()->onlyMonitored();
+$filters = WantedOptions::make()->onlyMonitored();
 $missing = $radarr->wanted()->missing(null, null, $filters);
 
 // Get ALL missing movies (automatically handles pagination)
@@ -226,7 +228,7 @@ $results = $radarr->api()->movie()->lookup('Inception');
 // Get queue with full options
 $pagination = new PaginationOptions(page: 1, pageSize: 100);
 $sort = SortOptions::by('timeleft')->ascending();
-$filters = QueueOptions::default()->withIncludeMovie(true);
+$filters = QueueOptions::make()->withIncludeMovie(true);
 $queue = $radarr->api()->queue()->all($pagination, $sort, $filters);
 
 // Delete from queue
@@ -249,9 +251,9 @@ The SDK provides typed request option classes:
 ```php
 use MartinCamen\ArrCore\Data\Options\PaginationOptions;
 
-$options = PaginationOptions::default();
+$options = PaginationOptions::make();
 $options = new PaginationOptions(page: 2, pageSize: 50);
-$options = PaginationOptions::default()->withPage(3)->withPageSize(100);
+$options = PaginationOptions::make()->withPage(3)->withPageSize(100);
 ```
 
 ### Sort Options
@@ -259,7 +261,7 @@ $options = PaginationOptions::default()->withPage(3)->withPageSize(100);
 ```php
 use MartinCamen\ArrCore\Data\Options\SortOptions;
 
-$options = SortOptions::none();
+$options = SortOptions::make(sortTitle: 'title');
 $options = SortOptions::by('title')->ascending();
 $options = SortOptions::by('date')->descending();
 ```

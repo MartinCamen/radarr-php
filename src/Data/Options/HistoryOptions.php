@@ -31,9 +31,16 @@ final readonly class HistoryOptions implements HistoryRequestOptions
         return $params;
     }
 
-    public static function default(): self
-    {
-        return new self();
+    public static function make(
+        ?HistoryEventType $eventType = null,
+        ?bool $includeMovie = null,
+        ?array $movieIds = null,
+    ): self {
+        return new self(
+            eventType: $eventType,
+            includeMovie: $includeMovie,
+            movieIds: $movieIds,
+        );
     }
 
     public function withEventType(HistoryEventType $eventType): self
@@ -46,7 +53,7 @@ final readonly class HistoryOptions implements HistoryRequestOptions
         return new self($this->eventType, $includeMovie, $this->movieIds);
     }
 
-    /** @param  array<int, int>  $movieIds */
+    /** @param array<int, int> $movieIds */
     public function withMovieIds(array $movieIds): self
     {
         return new self($this->eventType, $this->includeMovie, $movieIds);
