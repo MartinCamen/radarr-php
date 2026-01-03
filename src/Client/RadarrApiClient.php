@@ -47,6 +47,7 @@ class RadarrApiClient implements RadarrApiClientInterface
         int $timeout = 30,
         string $urlBase = '',
         ?RestClientInterface $restClient = null,
+        string $apiVersion = 'v3',
     ) {
         $config = new RadarrConfiguration(
             host: $host,
@@ -55,6 +56,7 @@ class RadarrApiClient implements RadarrApiClientInterface
             useHttps: $useHttps,
             timeout: $timeout,
             urlBase: $urlBase,
+            apiVersion: $apiVersion,
         );
 
         $this->client = $restClient ?? new RestClient($config);
@@ -69,6 +71,7 @@ class RadarrApiClient implements RadarrApiClientInterface
             useHttps: $config->useHttps,
             timeout: $config->timeout,
             urlBase: $config->urlBase,
+            apiVersion: $config->apiVersion,
         );
     }
 

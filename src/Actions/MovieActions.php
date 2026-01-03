@@ -13,16 +13,10 @@ final readonly class MovieActions
     public function __construct(private RestClientInterface $client) {}
 
     /** @link https://radarr.video/docs/api/#/Movie/get_api_v3_movie */
-    public function all(?int $tmdbId = null): MovieCollection
+    public function all(): MovieCollection
     {
-        $params = [];
-
-        if ($tmdbId !== null) {
-            $params['tmdbId'] = $tmdbId;
-        }
-
         return MovieCollection::fromArray(
-            $this->client->get(MovieEndpoint::All, $params),
+            $this->client->get(MovieEndpoint::All),
         );
     }
 

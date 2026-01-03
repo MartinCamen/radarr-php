@@ -7,13 +7,6 @@ use MartinCamen\ArrCore\Contract\ArrServiceConfigurationContract;
 
 class RadarrConfiguration extends ArrServiceConfiguration implements ArrServiceConfigurationContract
 {
-    public static function getDefaultPort(): int
-    {
-        return 7878;
-    }
-
-    public static function getDefaultVersion(): string
-    {
-        return 'v3';
-    }
+    public int $port = 7878;
+    public string $apiVersion = 'v3';
 }

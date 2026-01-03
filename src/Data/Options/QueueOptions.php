@@ -25,9 +25,14 @@ final readonly class QueueOptions implements RequestOptions
         return $params;
     }
 
-    public static function default(): self
-    {
-        return new self();
+    public static function make(
+        ?bool $includeUnknownMovieItems = null,
+        ?bool $includeMovie = null,
+    ): self {
+        return new self(
+            includeUnknownMovieItems: $includeUnknownMovieItems,
+            includeMovie: $includeMovie,
+        );
     }
 
     public function withIncludeUnknownMovieItems(bool $includeUnknownMovieItems): self

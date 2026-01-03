@@ -33,9 +33,18 @@ final readonly class CalendarOptions implements RequestOptions
         return $params;
     }
 
-    public static function default(): self
-    {
-        return new self();
+    public static function make(
+        ?DateTimeInterface $start = null,
+        ?DateTimeInterface $end = null,
+        ?bool $unmonitored = null,
+        ?array $tags = null,
+    ): self {
+        return new self(
+            start: $start,
+            end: $end,
+            unmonitored: $unmonitored,
+            tags: $tags,
+        );
     }
 
     public function withDateRange(?DateTimeInterface $start, ?DateTimeInterface $end): self
