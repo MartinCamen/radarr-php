@@ -3,19 +3,17 @@
 namespace MartinCamen\Radarr\Actions;
 
 use DateTimeInterface;
-use MartinCamen\ArrCore\Client\RestClientInterface;
-use MartinCamen\Radarr\Data\Enums\HistoryEndpoint;
+use MartinCamen\ArrCore\Actions\HistoryActions as CoreHistoryActions;
+use MartinCamen\ArrCore\Data\Enums\HistoryEndpoint;
+use MartinCamen\ArrCore\Data\Options\PaginationOptions;
+use MartinCamen\ArrCore\Data\Options\SortOptions;
 use MartinCamen\Radarr\Data\Options\HistoryOptions;
-use MartinCamen\Radarr\Data\Options\PaginationOptions;
-use MartinCamen\Radarr\Data\Options\SortOptions;
 use MartinCamen\Radarr\Data\Responses\HistoryPage;
 use MartinCamen\Radarr\Data\Responses\HistoryRecord;
 
 /** @link https://radarr.video/docs/api/#/History */
-final readonly class HistoryActions
+final readonly class HistoryActions extends CoreHistoryActions
 {
-    public function __construct(private RestClientInterface $client) {}
-
     /**
      * Get paginated history.
      *
@@ -26,38 +24,29 @@ final readonly class HistoryActions
         ?SortOptions $sort = null,
         ?HistoryOptions $filters = null,
     ): HistoryPage {
-        $params = array_merge(
-            $pagination?->toArray() ?? PaginationOptions::default()->toArray(),
-            $sort?->toArray() ?? [],
-            $filters?->toArray() ?? [],
+        $requestFilters = $filters?->toArray() ?? [];
+
+        if (($eventType = $filters?->eventType) instanceof \MartinCamen\Radarr\Data\Enums\HistoryEventType) {
+            $requestFilters['eventType'] = $eventType->numericValue();
+        }
+
+        return HistoryPage::fromArray(
+            $this->getAll($pagination, $sort, $requestFilters),
         );
-
-        $result = $this->client->get(HistoryEndpoint::All, $params);
-
-        return HistoryPage::fromArray($result);
     }
 
     /**
      * Get history since a specific date.
      *
-     * @return array<int, HistoryRecord>
-     *
-     * @link https://radarr.video/docs/api/#/History/get_api_v3_history_since
+     * @return array<string, HistoryRecord>
      */
     public function since(
         DateTimeInterface $date,
         ?HistoryOptions $filters = null,
     ): array {
-        $params = array_merge(
-            ['date' => $date->format('Y-m-d')],
-            $filters?->toArray() ?? [],
-        );
-
-        $result = $this->client->get(HistoryEndpoint::Since, $params);
-
         return array_map(
             HistoryRecord::fromArray(...),
-            $result ?? [],
+            $this->getAllSince($date, $filters),
         );
     }
 
@@ -68,12 +57,12 @@ final readonly class HistoryActions
      *
      * @link https://radarr.video/docs/api/#/History/get_api_v3_history_movie
      */
-    public function forMovie(
-        int $movieId,
+    public function find(
+        int $id,
         ?HistoryOptions $filters = null,
     ): array {
         $params = array_merge(
-            ['movieId' => $movieId],
+            ['movieId' => $id],
             $filters?->toArray() ?? [],
         );
 
@@ -83,15 +72,5 @@ final readonly class HistoryActions
             HistoryRecord::fromArray(...),
             $result ?? [],
         );
-    }
-
-    /**
-     * Mark a history item as failed.
-     *
-     * @link https://radarr.video/docs/api/#/History/post_api_v3_history_failed__id_
-     */
-    public function markFailed(int $id): void
-    {
-        $this->client->post(HistoryEndpoint::Failed, ['id' => $id]);
     }
 }

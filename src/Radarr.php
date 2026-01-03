@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MartinCamen\Radarr;
 
+use MartinCamen\ArrCore\Actions\WantedActions;
 use MartinCamen\ArrCore\Domain\Download\DownloadItemCollection;
 use MartinCamen\ArrCore\Domain\Media\Movie;
 use MartinCamen\ArrCore\Domain\System\SystemStatus;
 use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Actions\CommandActions;
 use MartinCamen\Radarr\Actions\HistoryActions;
-use MartinCamen\Radarr\Actions\WantedActions;
 use MartinCamen\Radarr\Client\RadarrApiClient;
 use MartinCamen\Radarr\Client\RadarrApiClientInterface;
 use MartinCamen\Radarr\Config\RadarrConfiguration;
@@ -42,9 +42,7 @@ use MartinCamen\Radarr\Mapper\RadarrToCoreMapper;
  */
 class Radarr implements RadarrInterface
 {
-    public function __construct(
-        private readonly RadarrApiClientInterface $apiClient,
-    ) {}
+    public function __construct(private readonly RadarrApiClientInterface $apiClient) {}
 
     /**
      * Create a new Radarr instance from connection parameters.
@@ -93,7 +91,7 @@ class Radarr implements RadarrInterface
     /**
      * Get all movies.
      *
-     * @return array<int, Movie>
+     * @return array<int|string, Movie>
      */
     public function movies(): array
     {
@@ -107,7 +105,7 @@ class Radarr implements RadarrInterface
      */
     public function movie(int $id): Movie
     {
-        $movie = $this->apiClient->movie()->get($id);
+        $movie = $this->apiClient->movie()->find($id);
 
         return RadarrToCoreMapper::mapMovie($movie);
     }

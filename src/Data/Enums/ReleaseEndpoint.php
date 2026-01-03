@@ -13,7 +13,7 @@ enum ReleaseEndpoint: string implements Endpoint
     case ById = 'release/{id}';
     case Push = 'release/push';
 
-    /** @return array<string, mixed> */
+    /** @return array<int, mixed> */
     public function defaultResponse(): array
     {
         return match ($this) {

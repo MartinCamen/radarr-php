@@ -21,17 +21,17 @@ final readonly class MovieActions
             $params['tmdbId'] = $tmdbId;
         }
 
-        $result = $this->client->get(MovieEndpoint::All, $params);
-
-        return MovieCollection::fromArray($result);
+        return MovieCollection::fromArray(
+            $this->client->get(MovieEndpoint::All, $params),
+        );
     }
 
     /** @link https://radarr.video/docs/api/#/Movie/get_api_v3_movie__id_ */
-    public function get(int $id): Movie
+    public function find(int $id): Movie
     {
-        $result = $this->client->get(MovieEndpoint::ById, ['id' => $id]);
-
-        return Movie::fromArray($result);
+        return Movie::fromArray(
+            $this->client->get(MovieEndpoint::ById, ['id' => $id]),
+        );
     }
 
     /**
@@ -39,27 +39,27 @@ final readonly class MovieActions
      *
      * @link https://radarr.video/docs/api/#/Movie/get_api_v3_movie_lookup
      */
-    public function lookup(string $term): MovieCollection
+    public function search(string $term): MovieCollection
     {
-        $result = $this->client->get(MovieEndpoint::Lookup, ['term' => $term]);
-
-        return MovieCollection::fromArray($result);
+        return MovieCollection::fromArray(
+            $this->client->get(MovieEndpoint::Lookup, ['term' => $term]),
+        );
     }
 
     /** @link https://radarr.video/docs/api/#/Movie/get_api_v3_movie_lookup_tmdb */
-    public function lookupByTmdb(int $tmdbId): Movie
+    public function searchByTmdb(int $tmdbId): Movie
     {
-        $result = $this->client->get(MovieEndpoint::LookupTmdb, ['tmdbId' => $tmdbId]);
-
-        return Movie::fromArray($result);
+        return Movie::fromArray(
+            $this->client->get(MovieEndpoint::LookupTmdb, ['tmdbId' => $tmdbId]),
+        );
     }
 
     /** @link https://radarr.video/docs/api/#/Movie/get_api_v3_movie_lookup_imdb */
-    public function lookupByImdb(string $imdbId): Movie
+    public function searchByImdb(string $imdbId): Movie
     {
-        $result = $this->client->get(MovieEndpoint::LookupImdb, ['imdbId' => $imdbId]);
-
-        return Movie::fromArray($result);
+        return Movie::fromArray(
+            $this->client->get(MovieEndpoint::LookupImdb, ['imdbId' => $imdbId]),
+        );
     }
 
     /**
@@ -71,9 +71,9 @@ final readonly class MovieActions
      */
     public function add(array $movieData): Movie
     {
-        $result = $this->client->post(MovieEndpoint::All, $movieData);
-
-        return Movie::fromArray($result);
+        return Movie::fromArray(
+            $this->client->post(MovieEndpoint::All, $movieData),
+        );
     }
 
     /**

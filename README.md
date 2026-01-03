@@ -133,8 +133,8 @@ Access download history:
 ```php
 use MartinCamen\Radarr\Data\Enums\HistoryEventType;
 use MartinCamen\Radarr\Data\Options\HistoryOptions;
-use MartinCamen\Radarr\Data\Options\PaginationOptions;
-use MartinCamen\Radarr\Data\Options\SortOptions;
+use MartinCamen\ArrCore\Data\Options\PaginationOptions;
+use MartinCamen\ArrCore\Data\Options\SortOptions;
 
 // Get paginated history with defaults
 $history = $radarr->history()->all();
@@ -159,7 +159,7 @@ $records = $radarr->history()->forMovie(1);
 Access missing movies and quality cutoff:
 
 ```php
-use MartinCamen\Radarr\Data\Options\WantedOptions;
+use MartinCamen\ArrCore\Data\Options\WantedOptions;
 
 // Get paginated missing movies
 $missing = $radarr->wanted()->missing();
@@ -180,7 +180,7 @@ $cutoff = $radarr->wanted()->cutoff();
 Execute Radarr commands:
 
 ```php
-use MartinCamen\Radarr\Data\Enums\CommandName;
+use MartinCamen\ArrCore\Data\Enums\CommandName;
 
 // Get all commands
 $commands = $radarr->command()->all();
@@ -247,7 +247,7 @@ The SDK provides typed request option classes:
 ### Pagination Options
 
 ```php
-use MartinCamen\Radarr\Data\Options\PaginationOptions;
+use MartinCamen\ArrCore\Data\Options\PaginationOptions;
 
 $options = PaginationOptions::default();
 $options = new PaginationOptions(page: 2, pageSize: 50);
@@ -257,7 +257,7 @@ $options = PaginationOptions::default()->withPage(3)->withPageSize(100);
 ### Sort Options
 
 ```php
-use MartinCamen\Radarr\Data\Options\SortOptions;
+use MartinCamen\ArrCore\Data\Options\SortOptions;
 
 $options = SortOptions::none();
 $options = SortOptions::by('title')->ascending();
