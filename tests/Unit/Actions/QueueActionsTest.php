@@ -3,12 +3,12 @@
 namespace MartinCamen\Radarr\Tests\Unit\Actions;
 
 use MartinCamen\ArrCore\Client\RestClientInterface;
+use MartinCamen\ArrCore\Data\Enums\QueueEndpoint;
 use MartinCamen\ArrCore\Data\Enums\SortDirection;
+use MartinCamen\ArrCore\Data\Options\PaginationOptions;
+use MartinCamen\ArrCore\Data\Options\SortOptions;
 use MartinCamen\ArrCore\Data\Responses\QueueStatus;
 use MartinCamen\Radarr\Actions\QueueActions;
-use MartinCamen\Radarr\Data\Enums\QueueEndpoint;
-use MartinCamen\Radarr\Data\Options\PaginationOptions;
-use MartinCamen\Radarr\Data\Options\SortOptions;
 use MartinCamen\Radarr\Data\Responses\QueuePage;
 use MartinCamen\Radarr\Data\Responses\QueueRecord;
 use MartinCamen\Radarr\Testing\Factories\DownloadFactory;
@@ -69,7 +69,7 @@ class QueueActionsTest extends TestCase
             ->willReturn(DownloadFactory::make(123));
 
         $queueActions = new QueueActions($client);
-        $record = $queueActions->get(123);
+        $record = $queueActions->find(123);
 
         $this->assertInstanceOf(QueueRecord::class, $record);
         $this->assertEquals(123, $record->id);

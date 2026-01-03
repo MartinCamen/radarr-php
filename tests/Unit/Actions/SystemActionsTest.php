@@ -2,12 +2,12 @@
 
 namespace MartinCamen\Radarr\Tests\Unit\Actions;
 
+use MartinCamen\ArrCore\Actions\SystemActions;
 use MartinCamen\ArrCore\Client\RestClientInterface;
+use MartinCamen\ArrCore\Data\Enums\SystemEndpoint;
 use MartinCamen\ArrCore\Data\Responses\DiskSpaceCollection;
 use MartinCamen\ArrCore\Domain\System\DownloadServiceSystemStatus;
 use MartinCamen\ArrCore\Domain\System\HealthCheckCollection;
-use MartinCamen\Radarr\Actions\SystemActions;
-use MartinCamen\Radarr\Data\Enums\SystemEndpoint;
 use MartinCamen\Radarr\Testing\Factories\SystemStatusFactory;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;

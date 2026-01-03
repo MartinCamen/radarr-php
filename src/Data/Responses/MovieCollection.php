@@ -12,10 +12,10 @@ use Traversable;
  */
 final class MovieCollection implements Countable, IteratorAggregate
 {
-    /** @param array<int, Movie> $movies */
+    /** @param array<int|string, Movie> $movies */
     public function __construct(private array $movies = []) {}
 
-    /** @param array<int, array<string, mixed>> $data */
+    /** @param array<string, mixed> $data */
     public static function fromArray(array $data): self
     {
         return new self(
@@ -26,7 +26,7 @@ final class MovieCollection implements Countable, IteratorAggregate
         );
     }
 
-    /** @return array<int, Movie> */
+    /** @return array<int|string, Movie> */
     public function all(): array
     {
         return $this->movies;
@@ -61,13 +61,13 @@ final class MovieCollection implements Countable, IteratorAggregate
         return $this->movies[$index] ?? null;
     }
 
-    /** @return Traversable<int, Movie> */
+    /** @return Traversable<int|string, Movie> */
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->movies);
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /** @return array<int|string, array<string, mixed>> */
     public function toArray(): array
     {
         return array_map(

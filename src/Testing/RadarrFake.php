@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MartinCamen\Radarr\Testing;
 
+use MartinCamen\ArrCore\Actions\WantedActions;
 use MartinCamen\ArrCore\Domain\Download\DownloadItemCollection;
 use MartinCamen\ArrCore\Domain\Media\Movie as CoreMovie;
 use MartinCamen\ArrCore\Domain\System\SystemStatus as CoreSystemStatus;
@@ -12,7 +13,6 @@ use MartinCamen\ArrCore\Testing\Traits\FakesArrDownloadServices;
 use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Actions\CommandActions;
 use MartinCamen\Radarr\Actions\HistoryActions;
-use MartinCamen\Radarr\Actions\WantedActions;
 use MartinCamen\Radarr\Client\RadarrApiClientInterface;
 use MartinCamen\Radarr\Data\Responses\Movie;
 use MartinCamen\Radarr\Data\Responses\QueuePage;
@@ -59,7 +59,7 @@ final class RadarrFake extends BaseFake implements RadarrInterface
     /**
      * Get all movies.
      *
-     * @return array<int, CoreMovie>
+     * @return array<int|string, CoreMovie>
      */
     public function movies(): array
     {

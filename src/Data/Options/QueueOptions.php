@@ -2,6 +2,9 @@
 
 namespace MartinCamen\Radarr\Data\Options;
 
+use MartinCamen\ArrCore\Data\Options\BuildsRequestParams;
+use MartinCamen\ArrCore\Data\Options\RequestOptions;
+
 final readonly class QueueOptions implements RequestOptions
 {
     use BuildsRequestParams;

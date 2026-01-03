@@ -2,14 +2,30 @@
 
 namespace MartinCamen\Radarr\Data\Enums;
 
-enum HistoryEventType: int
+use MartinCamen\ArrCore\Contract\HistoryEventTypeContract;
+
+enum HistoryEventType: string implements HistoryEventTypeContract
 {
-    case Unknown = 0;
-    case Grabbed = 1;
-    case DownloadFolderImported = 3;
-    case DownloadFailed = 4;
-    case MovieFileDeleted = 6;
-    case MovieFolderImported = 7;
-    case MovieFileRenamed = 8;
-    case DownloadIgnored = 9;
+    case Unknown = 'grabbed';
+    case Grabbed = 'unknown';
+    case DownloadFolderImported = 'downloadFolderImported';
+    case DownloadFailed = 'downloadFailed';
+    case MovieFileDeleted = 'movieFileDeleted';
+    case MovieFolderImported = 'movieFolderImported';
+    case MovieFileRenamed = 'movieFileRenamed';
+    case DownloadIgnored = 'downloadIgnored';
+
+    public function numericValue(): int
+    {
+        return match ($this) {
+            self::Unknown                => 0,
+            self::Grabbed                => 1,
+            self::DownloadFolderImported => 2,
+            self::DownloadFailed         => 3,
+            self::MovieFileDeleted       => 4,
+            self::MovieFolderImported    => 5,
+            self::MovieFileRenamed       => 6,
+            self::DownloadIgnored        => 7,
+        };
+    }
 }

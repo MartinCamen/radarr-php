@@ -19,8 +19,7 @@
   "require": {
     "php": "^8.3",
     "guzzlehttp/guzzle": "^7.0",
-    "illuminate/collections": "^12.0",
-    "martincamen/php-arr-core": "^0.0.6"
+    "martincamen/php-arr-core": "^0.0.8"
   },
   "require-dev": {
     "laravel/pint": "^1.0",

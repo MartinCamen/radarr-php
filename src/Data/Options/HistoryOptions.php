@@ -2,9 +2,11 @@
 
 namespace MartinCamen\Radarr\Data\Options;
 
+use MartinCamen\ArrCore\Data\Options\BuildsRequestParams;
+use MartinCamen\ArrCore\Data\Options\HistoryRequestOptions;
 use MartinCamen\Radarr\Data\Enums\HistoryEventType;
 
-final readonly class HistoryOptions implements RequestOptions
+final readonly class HistoryOptions implements HistoryRequestOptions
 {
     use BuildsRequestParams;
 

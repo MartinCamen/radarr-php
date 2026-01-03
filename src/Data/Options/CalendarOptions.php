@@ -3,6 +3,8 @@
 namespace MartinCamen\Radarr\Data\Options;
 
 use DateTimeInterface;
+use MartinCamen\ArrCore\Data\Options\BuildsRequestParams;
+use MartinCamen\ArrCore\Data\Options\RequestOptions;
 
 final readonly class CalendarOptions implements RequestOptions
 {

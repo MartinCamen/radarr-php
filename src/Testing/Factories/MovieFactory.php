@@ -2,6 +2,8 @@
 
 namespace MartinCamen\Radarr\Testing\Factories;
 
+use MartinCamen\PhpFileSize\FileSize;
+
 class MovieFactory
 {
     /**
@@ -61,14 +63,16 @@ class MovieFactory
      */
     public static function makeDownloaded(int $id = 1, array $overrides = []): array
     {
+        $fileSize = (new FileSize())->gigabytes(4.5)->toBytes();
+
         return self::make($id, array_merge([
             'hasFile'    => true,
-            'sizeOnDisk' => 4500000000, // ~4.5GB
+            'sizeOnDisk' => $fileSize,
             'movieFile'  => [
                 'id'           => $id,
                 'movieId'      => $id,
                 'relativePath' => "Test.Movie.{$id}.2024.1080p.BluRay.mkv",
-                'size'         => 4500000000,
+                'size'         => $fileSize,
                 'quality'      => ['quality' => ['name' => 'Bluray-1080p']],
             ],
         ], $overrides));

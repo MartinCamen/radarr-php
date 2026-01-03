@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MartinCamen\Radarr;
 
+use MartinCamen\ArrCore\Actions\WantedActions;
 use MartinCamen\ArrCore\Domain\Download\DownloadItemCollection;
 use MartinCamen\ArrCore\Domain\Media\Movie;
 use MartinCamen\ArrCore\Domain\System\SystemStatus;
 use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Actions\CommandActions;
 use MartinCamen\Radarr\Actions\HistoryActions;
-use MartinCamen\Radarr\Actions\WantedActions;
 use MartinCamen\Radarr\Client\RadarrApiClientInterface;
 
 /**

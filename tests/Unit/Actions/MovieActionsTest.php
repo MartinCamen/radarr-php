@@ -54,7 +54,7 @@ class MovieActionsTest extends TestCase
             ->willReturn(MovieFactory::make(123));
 
         $movieActions = new MovieActions($client);
-        $movie = $movieActions->get(123);
+        $movie = $movieActions->find(123);
 
         $this->assertInstanceOf(Movie::class, $movie);
         $this->assertEquals(123, $movie->id);
@@ -70,7 +70,7 @@ class MovieActionsTest extends TestCase
             ->willReturn(MovieFactory::makeMany(5));
 
         $movieActions = new MovieActions($client);
-        $movies = $movieActions->lookup('inception');
+        $movies = $movieActions->search('inception');
 
         $this->assertInstanceOf(MovieCollection::class, $movies);
         $this->assertCount(5, $movies);
@@ -86,7 +86,7 @@ class MovieActionsTest extends TestCase
             ->willReturn(MovieFactory::make(1, ['tmdbId' => 27205, 'title' => 'Inception']));
 
         $movieActions = new MovieActions($client);
-        $movie = $movieActions->lookupByTmdb(27205);
+        $movie = $movieActions->searchByTmdb(27205);
 
         $this->assertInstanceOf(Movie::class, $movie);
         $this->assertEquals(27205, $movie->tmdbId);
@@ -102,7 +102,7 @@ class MovieActionsTest extends TestCase
             ->willReturn(MovieFactory::make(1, ['imdbId' => 'tt1375666']));
 
         $movieActions = new MovieActions($client);
-        $movie = $movieActions->lookupByImdb('tt1375666');
+        $movie = $movieActions->searchByImdb('tt1375666');
 
         $this->assertInstanceOf(Movie::class, $movie);
         $this->assertEquals('tt1375666', $movie->imdbId);

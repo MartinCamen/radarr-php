@@ -9,15 +9,14 @@ use MartinCamen\ArrCore\Domain\Download\DownloadItemCollection;
 use MartinCamen\ArrCore\Domain\Media\Movie;
 use MartinCamen\ArrCore\Domain\System\DownloadServiceSystemStatus;
 use MartinCamen\ArrCore\Domain\System\HealthCheck;
-use MartinCamen\ArrCore\Domain\System\HealthIssue;
 use MartinCamen\ArrCore\Domain\System\SystemStatus;
 use MartinCamen\ArrCore\Enum\Service;
+use MartinCamen\ArrCore\Mapping\ServiceToCoreMapper;
 use MartinCamen\ArrCore\Mapping\StatusNormalizer;
 use MartinCamen\ArrCore\ValueObject\ArrId;
 use MartinCamen\ArrCore\ValueObject\Duration;
 use MartinCamen\ArrCore\ValueObject\FileSize;
 use MartinCamen\ArrCore\ValueObject\Progress;
-use MartinCamen\ArrCore\ValueObject\Timestamp;
 use MartinCamen\Radarr\Data\Responses\Movie as RadarrMovie;
 use MartinCamen\Radarr\Data\Responses\MovieCollection;
 use MartinCamen\Radarr\Data\Responses\QueuePage;
@@ -29,7 +28,7 @@ use MartinCamen\Radarr\Data\Responses\QueueRecord;
  * This class provides pure, deterministic transformations from
  * Radarr-specific data structures to canonical core models.
  */
-final class RadarrToCoreMapper
+final class RadarrToCoreMapper extends ServiceToCoreMapper
 {
     /**
      * Map Radarr Movie DTO to Core Movie model.
@@ -58,7 +57,7 @@ final class RadarrToCoreMapper
     /**
      * Map Radarr Movie collection to array of Core Movies.
      *
-     * @return array<int, Movie>
+     * @return array<int|string, Movie>
      */
     public static function mapMovieCollection(MovieCollection $collection): array
     {
@@ -119,69 +118,6 @@ final class RadarrToCoreMapper
      */
     public static function mapSystemStatus(DownloadServiceSystemStatus $dto, array $healthChecks = []): SystemStatus
     {
-        $issues = array_map(
-            fn(HealthCheck $check): HealthIssue => new HealthIssue(
-                type: $check->type,
-                message: $check->message,
-                source: $check->source,
-                wikiUrl: $check->wikiUrl,
-            ),
-            $healthChecks,
-        );
-
-        return new SystemStatus(
-            source: Service::Radarr,
-            version: $dto->version,
-            isHealthy: count($issues) === 0,
-            startTime: $dto->startTime !== '' ? Timestamp::fromString($dto->startTime) : null,
-            branch: $dto->branch,
-            runtimeVersion: $dto->runtimeVersion,
-            osName: $dto->osName,
-            healthIssues: $issues,
-        );
-    }
-
-    /**
-     * Parse a .NET TimeSpan string (d.hh:mm:ss or hh:mm:ss) to Duration.
-     */
-    private static function parseTimeSpan(?string $timeSpan): ?Duration
-    {
-        if ($timeSpan === null || $timeSpan === '') {
-            return null;
-        }
-
-        $seconds = 0;
-
-        // Handle format: d.hh:mm:ss or hh:mm:ss
-        if (str_contains($timeSpan, '.')) {
-            [$days, $time] = explode('.', $timeSpan, 2);
-            $seconds += (int) $days * 86400;
-            $timeSpan = $time;
-        }
-
-        $parts = explode(':', $timeSpan);
-        if (count($parts) === 3) {
-            $seconds += (int) $parts[0] * 3600;
-            $seconds += (int) $parts[1] * 60;
-            $seconds += (int) $parts[2];
-        }
-
-        return Duration::fromSeconds($seconds);
-    }
-
-    /**
-     * Extract image URL from images array.
-     *
-     * @param array<int, array<string, mixed>> $images
-     */
-    private static function extractImage(array $images, string $type): ?string
-    {
-        foreach ($images as $image) {
-            if (($image['coverType'] ?? '') === $type) {
-                return $image['remoteUrl'] ?? $image['url'] ?? null;
-            }
-        }
-
-        return null;
+        return self::mapToSystemStatus(Service::Radarr, $dto, $healthChecks);
     }
 }
