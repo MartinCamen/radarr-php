@@ -26,7 +26,6 @@ class QueueRecordTest extends TestCase
         $record = QueueRecord::fromArray($data);
         $array = $record->toArray();
 
-        $this->assertIsArray($array);
         $this->assertEquals(1, $array['id']);
     }
 
