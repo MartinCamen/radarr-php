@@ -8,23 +8,27 @@ use MartinCamen\ArrCore\Actions\SystemActions;
 use MartinCamen\ArrCore\Actions\WantedActions;
 use MartinCamen\ArrCore\Domain\Download\DownloadItemCollection;
 use MartinCamen\ArrCore\Domain\Media\Movie as CoreMovie;
+use MartinCamen\ArrCore\Domain\System\DownloadServiceSystemSummary;
+use MartinCamen\ArrCore\Domain\System\HealthCheckCollection;
 use MartinCamen\ArrCore\Domain\System\SystemSummary;
 use MartinCamen\ArrCore\Testing\BaseFake;
-use MartinCamen\ArrCore\Testing\Traits\FakesArrDownloadServices;
 use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Actions\CommandActions;
 use MartinCamen\Radarr\Actions\HistoryActions;
 use MartinCamen\Radarr\Client\RadarrApiClientInterface;
 use MartinCamen\Radarr\Data\Responses\Movie;
+use MartinCamen\Radarr\Data\Responses\MovieCollection;
 use MartinCamen\Radarr\Data\Responses\QueuePage;
 use MartinCamen\Radarr\Mapper\RadarrToCoreMapper;
 use MartinCamen\Radarr\RadarrInterface;
+use MartinCamen\Radarr\Testing\Factories\DownloadFactory;
 use MartinCamen\Radarr\Testing\Factories\MovieFactory;
+use MartinCamen\Radarr\Testing\Factories\SystemStatusFactory;
 
 /**
  * Fake implementation for testing.
  *
- * Provides the same interface as Radarr SDK but allows
+ * Provides the same interface as the Radarr SDK but allows
  * custom responses and tracks method calls for assertions.
  *
  * @example
@@ -39,8 +43,6 @@ use MartinCamen\Radarr\Testing\Factories\MovieFactory;
  */
 final class RadarrFake extends BaseFake implements RadarrInterface
 {
-    use FakesArrDownloadServices;
-
     private ?RadarrApiFake $apiFake = null;
 
     /**
@@ -50,7 +52,7 @@ final class RadarrFake extends BaseFake implements RadarrInterface
     {
         $this->recordCall('downloads', []);
 
-        $queueData = $this->formatsDownloads();
+        $queueData = $this->formatDownloads();
 
         return RadarrToCoreMapper::mapQueuePage(
             QueuePage::fromArray($queueData),
@@ -68,7 +70,9 @@ final class RadarrFake extends BaseFake implements RadarrInterface
 
         $movies = $this->responses['movies'] ?? MovieFactory::makeMany(3);
 
-        return RadarrToCoreMapper::mapMovieCollection($movies);
+        return RadarrToCoreMapper::mapMovieCollection(
+            MovieCollection::fromArray($movies),
+        );
     }
 
     /**
@@ -156,5 +160,32 @@ final class RadarrFake extends BaseFake implements RadarrInterface
     public function api(): RadarrApiClientInterface
     {
         return $this->apiFake ??= new RadarrApiFake();
+    }
+
+    /** @return array<string, mixed> */
+    protected function formatDownloads(): array
+    {
+        return $this->responses['downloads'] ?? [
+            'page'         => 1,
+            'pageSize'     => 10,
+            'totalRecords' => 2,
+            'records'      => DownloadFactory::makeMany(2),
+        ];
+    }
+
+    protected function getStatusForDownloadServiceSystemSummary(): DownloadServiceSystemSummary
+    {
+        $data = $this->responses['systemSummary'] ?? SystemStatusFactory::make();
+
+        return DownloadServiceSystemSummary::fromArray($data);
+    }
+
+    protected function getHealthForDownloadServiceSystemSummary(): HealthCheckCollection
+    {
+        $data = isset($this->responses['systemSummary'])
+            ? $this->responses['health']
+            : [];
+
+        return HealthCheckCollection::fromArray($data ?? []);
     }
 }
