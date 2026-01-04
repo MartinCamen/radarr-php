@@ -6,7 +6,7 @@ use MartinCamen\ArrCore\Actions\SystemActions;
 use MartinCamen\ArrCore\Client\RestClientInterface;
 use MartinCamen\ArrCore\Data\Enums\SystemEndpoint;
 use MartinCamen\ArrCore\Data\Responses\DiskSpaceCollection;
-use MartinCamen\ArrCore\Domain\System\DownloadServiceSystemStatus;
+use MartinCamen\ArrCore\Domain\System\DownloadServiceSystemSummary;
 use MartinCamen\ArrCore\Domain\System\HealthCheckCollection;
 use MartinCamen\Radarr\Testing\Factories\SystemStatusFactory;
 use PHPUnit\Framework\Attributes\Test;
@@ -26,7 +26,7 @@ class SystemActionsTest extends TestCase
         $systemActions = new SystemActions($client);
         $status = $systemActions->status();
 
-        $this->assertInstanceOf(DownloadServiceSystemStatus::class, $status);
+        $this->assertInstanceOf(DownloadServiceSystemSummary::class, $status);
         $this->assertEquals('Radarr', $status->appName);
         $this->assertEquals('5.0.0.0000', $status->version);
     }

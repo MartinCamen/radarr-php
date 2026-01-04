@@ -15,7 +15,7 @@ final class MovieCollection implements Countable, IteratorAggregate
     /** @param array<int|string, Movie> $movies */
     public function __construct(private array $movies = []) {}
 
-    /** @param array<string, mixed> $data */
+    /** @param array<int, array<string, mixed>> $data */
     public static function fromArray(array $data): self
     {
         return new self(

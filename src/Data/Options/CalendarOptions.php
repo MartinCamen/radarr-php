@@ -10,9 +10,7 @@ final readonly class CalendarOptions implements RequestOptions
 {
     use BuildsRequestParams;
 
-    /**
-     * @param array<int, int>|null $tags
-     */
+    /** @param array<int, int>|null $tags */
     public function __construct(
         public ?DateTimeInterface $start = null,
         public ?DateTimeInterface $end = null,
@@ -33,6 +31,7 @@ final readonly class CalendarOptions implements RequestOptions
         return $params;
     }
 
+    /** @param array<int, int>|null $tags */
     public static function make(
         ?DateTimeInterface $start = null,
         ?DateTimeInterface $end = null,

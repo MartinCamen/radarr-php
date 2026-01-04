@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace MartinCamen\Radarr;
 
+use MartinCamen\ArrCore\Actions\SystemActions;
 use MartinCamen\ArrCore\Actions\WantedActions;
 use MartinCamen\ArrCore\Domain\Download\DownloadItemCollection;
 use MartinCamen\ArrCore\Domain\Media\Movie;
-use MartinCamen\ArrCore\Domain\System\SystemStatus;
+use MartinCamen\ArrCore\Domain\System\SystemSummary;
 use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Actions\CommandActions;
 use MartinCamen\Radarr\Actions\HistoryActions;
@@ -37,7 +38,7 @@ use MartinCamen\Radarr\Mapper\RadarrToCoreMapper;
  * $movies = $radarr->movies();
  *
  * // Get system status
- * $status = $radarr->systemStatus();
+ * $status = $radarr->system()->status();
  * ```
  */
 class Radarr implements RadarrInterface
@@ -111,14 +112,24 @@ class Radarr implements RadarrInterface
     }
 
     /**
+     * Access system functionality.
+     *
+     * Provides access to system information, health information, and more.
+     */
+    public function system(): SystemActions
+    {
+        return $this->apiClient->system();
+    }
+
+    /**
      * Get system status including health checks.
      */
-    public function systemStatus(): SystemStatus
+    public function systemSummary(): SystemSummary
     {
         $status = $this->apiClient->system()->status();
         $health = $this->apiClient->system()->health();
 
-        return RadarrToCoreMapper::mapSystemStatus($status, $health->all());
+        return RadarrToCoreMapper::mapSystemSummary($status, $health->all());
     }
 
     /**

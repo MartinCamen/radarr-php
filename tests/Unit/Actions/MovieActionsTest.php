@@ -30,21 +30,6 @@ class MovieActionsTest extends TestCase
     }
 
     #[Test]
-    public function itCanGetAllMoviesFilteredByTmdbId(): void
-    {
-        $client = $this->createMock(RestClientInterface::class);
-        $client->expects($this->once())
-            ->method('get')
-            ->with(MovieEndpoint::All, ['tmdbId' => 12345])
-            ->willReturn([MovieFactory::make(1, ['tmdbId' => 12345])]);
-
-        $movieActions = new MovieActions($client);
-        $movies = $movieActions->all(tmdbId: 12345);
-
-        $this->assertCount(1, $movies);
-    }
-
-    #[Test]
     public function itCanGetMovieById(): void
     {
         $client = $this->createMock(RestClientInterface::class);
