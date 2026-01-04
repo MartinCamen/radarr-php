@@ -27,7 +27,6 @@ class MovieTest extends TestCase
         $movie = Movie::fromArray($data);
         $array = $movie->toArray();
 
-        $this->assertIsArray($array);
         $this->assertEquals(1, $array['id']);
         $this->assertArrayHasKey('title', $array);
     }

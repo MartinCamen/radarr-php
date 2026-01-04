@@ -186,6 +186,6 @@ final class RadarrFake extends BaseFake implements RadarrInterface
             ? ($this->responses['health'] ?? [])
             : [];
 
-        return HealthCheckCollection::fromArray($data ?? []);
+        return HealthCheckCollection::fromArray($data);
     }
 }

@@ -150,6 +150,7 @@ class MovieActionsTest extends TestCase
         $movieActions = new MovieActions($client);
         $movieActions->delete(123, deleteFiles: true);
 
-        $this->assertTrue(true); // No exception means success
+        // No exception means success
+        $this->addToAssertionCount(1);
     }
 }

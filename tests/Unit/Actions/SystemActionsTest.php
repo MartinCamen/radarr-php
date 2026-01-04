@@ -83,7 +83,6 @@ class SystemActionsTest extends TestCase
         $systemActions = new SystemActions($client);
         $tasks = $systemActions->tasks();
 
-        $this->assertIsArray($tasks);
         $this->assertCount(1, $tasks);
     }
 
@@ -99,7 +98,6 @@ class SystemActionsTest extends TestCase
         $systemActions = new SystemActions($client);
         $task = $systemActions->task(1);
 
-        $this->assertIsArray($task);
         $this->assertEquals(1, $task['id']);
     }
 
@@ -117,7 +115,6 @@ class SystemActionsTest extends TestCase
         $systemActions = new SystemActions($client);
         $backups = $systemActions->backups();
 
-        $this->assertIsArray($backups);
         $this->assertCount(1, $backups);
     }
 }

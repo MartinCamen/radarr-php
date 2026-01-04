@@ -118,7 +118,8 @@ class QueueActionsTest extends TestCase
         $queueActions = new QueueActions($client);
         $queueActions->delete(123, blocklist: true);
 
-        $this->assertTrue(true);
+        // No exception means success
+        $this->addToAssertionCount(1);
     }
 
     #[Test]
@@ -139,6 +140,7 @@ class QueueActionsTest extends TestCase
         $queueActions = new QueueActions($client);
         $queueActions->bulkDelete([1, 2, 3]);
 
-        $this->assertTrue(true);
+        // No exception means success
+        $this->addToAssertionCount(1);
     }
 }
