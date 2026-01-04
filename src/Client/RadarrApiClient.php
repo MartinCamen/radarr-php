@@ -6,7 +6,6 @@ namespace MartinCamen\Radarr\Client;
 
 use MartinCamen\ArrCore\Actions\SystemActions;
 use MartinCamen\ArrCore\Actions\WantedActions;
-use MartinCamen\ArrCore\Client\RestClient;
 use MartinCamen\ArrCore\Client\RestClientInterface;
 use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Actions\CommandActions;
@@ -59,7 +58,7 @@ class RadarrApiClient implements RadarrApiClientInterface
             apiVersion: $apiVersion,
         );
 
-        $this->client = $restClient ?? new RestClient($config);
+        $this->client = $restClient ?? new RadarrRestClient($config);
     }
 
     public static function make(RadarrConfiguration $config): self
