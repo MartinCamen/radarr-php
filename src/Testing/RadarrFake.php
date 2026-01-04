@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace MartinCamen\Radarr\Testing;
 
+use MartinCamen\ArrCore\Actions\SystemActions;
 use MartinCamen\ArrCore\Actions\WantedActions;
 use MartinCamen\ArrCore\Domain\Download\DownloadItemCollection;
 use MartinCamen\ArrCore\Domain\Media\Movie as CoreMovie;
-use MartinCamen\ArrCore\Domain\System\SystemStatus as CoreSystemStatus;
+use MartinCamen\ArrCore\Domain\System\SystemSummary;
 use MartinCamen\ArrCore\Testing\BaseFake;
 use MartinCamen\ArrCore\Testing\Traits\FakesArrDownloadServices;
 use MartinCamen\Radarr\Actions\CalendarActions;
@@ -89,14 +90,24 @@ final class RadarrFake extends BaseFake implements RadarrInterface
     /**
      * Get system status.
      */
-    public function systemStatus(): CoreSystemStatus
+    public function system(): SystemActions
     {
-        $this->recordCall('systemStatus', []);
+        $this->recordCall('system', []);
 
-        $status = $this->getStatusForDownloadServiceSystemStatus();
-        $health = $this->getHealthForDownloadServiceSystemStatus();
+        return $this->api()->system();
+    }
 
-        return RadarrToCoreMapper::mapSystemStatus($status, $health->all());
+    /**
+     * Get system summary.
+     */
+    public function systemSummary(): SystemSummary
+    {
+        $this->recordCall('systemSummary', []);
+
+        $status = $this->getStatusForDownloadServiceSystemSummary();
+        $health = $this->getHealthForDownloadServiceSystemSummary();
+
+        return RadarrToCoreMapper::mapSystemSummary($status, $health->all());
     }
 
     /**

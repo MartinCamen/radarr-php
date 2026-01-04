@@ -10,9 +10,7 @@ final readonly class HistoryOptions implements HistoryRequestOptions
 {
     use BuildsRequestParams;
 
-    /**
-     * @param array<int, int>|null $movieIds
-     */
+    /** @param array<int, int>|null $movieIds */
     public function __construct(
         public ?HistoryEventType $eventType = null,
         public ?bool $includeMovie = null,
@@ -31,6 +29,7 @@ final readonly class HistoryOptions implements HistoryRequestOptions
         return $params;
     }
 
+    /** @param array<int, int>|null $movieIds */
     public static function make(
         ?HistoryEventType $eventType = null,
         ?bool $includeMovie = null,
