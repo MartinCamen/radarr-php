@@ -183,7 +183,7 @@ final class RadarrFake extends BaseFake implements RadarrInterface
     protected function getHealthForDownloadServiceSystemSummary(): HealthCheckCollection
     {
         $data = isset($this->responses['systemSummary'])
-            ? $this->responses['health']
+            ? ($this->responses['health'] ?? [])
             : [];
 
         return HealthCheckCollection::fromArray($data ?? []);
