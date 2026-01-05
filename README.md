@@ -2,6 +2,11 @@
 
 A PHP SDK for the Radarr REST API v3.
 
+Also available:
+- [PHP Sonarr integration](https://github.com/martincamen/sonarr-php)
+- [Laravel Radarr integration](https://github.com/martincamen/laravel-radarr)
+- [Laravel Sonarr integration](https://github.com/martincamen/laravel-sonarr)
+
 ## Requirements
 
 - PHP 8.3+
@@ -72,7 +77,11 @@ echo $downloads->totalProgress()->percentage() . '%';
 ### Movies
 
 ```php
+use MartinCamen\ArrCore\Domain\Media\Movie;
+use MartinCamen\Radarr\Radarr;
+
 // Get all movies
+/** @var Movie[] $movies */
 $movies = $radarr->movies();
 
 foreach ($movies as $movie) {
@@ -83,7 +92,9 @@ foreach ($movies as $movie) {
 }
 
 // Get a specific movie by ID
+/** @var Movie $movie */
 $movie = $radarr->movie(1);
+
 echo $movie->title;
 echo $movie->overview;
 ```
@@ -91,9 +102,14 @@ echo $movie->overview;
 ### System Status
 
 ```php
-echo $radarr->system()->status()->version;
+use MartinCamen\ArrCore\Actions\SystemActions;
 
-foreach ($radarr->system()->health()->warnings() as $warning) {
+/** @var SystemActions $system */
+$system = $radarr->system();
+
+echo $system->status()->version;
+
+foreach ($system->health()->warnings() as $warning) {
     echo $warning->type . ': ' . $warning->message;
 }
 ```
@@ -101,6 +117,9 @@ foreach ($radarr->system()->health()->warnings() as $warning) {
 ### System Summary
 
 ```php
+use MartinCamen\ArrCore\Domain\System\SystemSummary;
+
+/** @var SystemSummary $summary */
 $summary = $radarr->systemSummary();
 
 echo $summary->version;
@@ -116,10 +135,14 @@ foreach ($summary->healthIssues as $issue) {
 Access upcoming movie releases:
 
 ```php
+use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Data\Options\CalendarOptions;
 
+/** @var CalendarActions $calendar */
+$calendar = $radarr->calendar();
+
 // Get upcoming movies (defaults to today to today + 2 days)
-$calendar = $radarr->calendar()->get();
+$calendar = $calendar->all();
 
 // Get movies within a specific date range
 $options = CalendarOptions::make()
@@ -128,14 +151,14 @@ $options = CalendarOptions::make()
         new DateTime('2024-01-31'),
     );
 
-$movies = $radarr->calendar()->get($options);
+$movies = $calendar->all($options);
 
 // Include unmonitored movies and filter by tags
 $options = CalendarOptions::make()
     ->withUnmonitored(true)
     ->withTags([1, 2]);
 
-$movies = $radarr->calendar()->get($options);
+$movies = $calendar->all($options);
 ```
 
 ### History
@@ -143,27 +166,29 @@ $movies = $radarr->calendar()->get($options);
 Access download history:
 
 ```php
-use MartinCamen\Radarr\Data\Enums\HistoryEventType;
-use MartinCamen\Radarr\Data\Options\HistoryOptions;
 use MartinCamen\ArrCore\Data\Options\PaginationOptions;
 use MartinCamen\ArrCore\Data\Options\SortOptions;
+use MartinCamen\Radarr\Actions\HistoryActions;
+use MartinCamen\Radarr\Data\Enums\HistoryEventType;
+use MartinCamen\Radarr\Data\Options\HistoryOptions;
 
+/** @var HistoryActions $history */
+$history = $radarr->history();
+
+/** @var HistoryPage $historyPage */
 // Get paginated history with defaults
-$history = $radarr->history()->all();
+$historyPage = $history->all();
 
 // Get history with custom pagination and sorting
 $pagination = new PaginationOptions(page: 1, pageSize: 50);
 $sort = SortOptions::by('date')->descending();
-$history = $radarr->history()->all($pagination, $sort);
+$history = $history->all($pagination, $sort);
 
 // Filter by event type
 $filters = HistoryOptions::make()
     ->withEventType(HistoryEventType::Grabbed)
     ->withIncludeMovie(true);
-$history = $radarr->history()->all(null, null, $filters);
-
-// Get history for a specific movie
-$records = $radarr->history()->forMovie(1);
+$history = $history->all(null, null, $filters);
 ```
 
 ### Wanted (Missing & Cutoff)
@@ -171,20 +196,24 @@ $records = $radarr->history()->forMovie(1);
 Access missing movies and quality cutoff:
 
 ```php
+use MartinCamen\ArrCore\Actions\WantedActions;
 use MartinCamen\ArrCore\Data\Options\WantedOptions;
 
+/** @var WantedActions $wanted */
+$wanted = $radarr->wanted();
+
 // Get paginated missing movies
-$missing = $radarr->wanted()->missing();
+$missing = $wanted->missing();
 
 // Filter to only monitored movies
 $filters = WantedOptions::make()->onlyMonitored();
-$missing = $radarr->wanted()->missing(null, null, $filters);
+$missing = $wanted->missing(null, null, $filters);
 
 // Get ALL missing movies (automatically handles pagination)
-$allMissing = $radarr->wanted()->allMissing();
+$allMissing = $wanted->allMissing();
 
 // Get movies below quality cutoff
-$cutoff = $radarr->wanted()->cutoff();
+$cutoff = $wanted->cutoff();
 ```
 
 ### Commands
@@ -194,14 +223,17 @@ Execute Radarr commands:
 ```php
 use MartinCamen\ArrCore\Data\Enums\CommandName;
 
+/** @var CommandActions $commands */
+$commands = $radarr->command();
+
 // Get all commands
-$commands = $radarr->command()->all();
+$commands = $commands->all();
 
 // Execute a refresh monitored downloads command
-$command = $radarr->command()->execute(CommandName::RefreshMonitoredDownloads);
+$command = $commands->execute(CommandName::RefreshMonitoredDownloads);
 
 // Execute a movie search
-$command = $radarr->command()->execute(
+$command = $commands->execute(
     CommandName::MoviesSearch,
     ['movieIds' => [1, 2, 3]],
 );
@@ -212,6 +244,11 @@ $command = $radarr->command()->execute(
 For operations not yet exposed through the SDK, use the `api()` method to access the low-level API client:
 
 ```php
+use MartinCamen\ArrCore\Data\Options\PaginationOptions;
+use MartinCamen\ArrCore\Data\Options\SortOptions;
+use MartinCamen\Radarr\Data\Options\QueueOptions;
+use MartinCamen\Radarr\Radarr;
+
 // Add a new movie
 $movieData = [
     'title'            => 'Inception',
@@ -224,6 +261,8 @@ $movieData = [
         'searchForMovie' => true,
     ],
 ];
+
+/** @var Radarr $radarr */
 $radarr->api()->movie()->add($movieData);
 
 // Update a movie
@@ -233,7 +272,7 @@ $radarr->api()->movie()->update(1, $movieData);
 $radarr->api()->movie()->delete(1, deleteFiles: true);
 
 // Search for movies
-$results = $radarr->api()->movie()->lookup('Inception');
+$results = $radarr->api()->movie()->search('Inception');
 
 // Get queue with full options
 $pagination = new PaginationOptions(page: 1, pageSize: 100);
