@@ -9,9 +9,9 @@ use MartinCamen\ArrCore\Actions\WantedActions;
 use MartinCamen\ArrCore\Testing\BaseApiFake;
 use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Actions\CommandActions;
+use MartinCamen\Radarr\Actions\DownloadActions;
 use MartinCamen\Radarr\Actions\HistoryActions;
 use MartinCamen\Radarr\Actions\MovieActions;
-use MartinCamen\Radarr\Actions\QueueActions;
 use MartinCamen\Radarr\Client\RadarrApiClientInterface;
 
 /**
@@ -24,14 +24,14 @@ use MartinCamen\Radarr\Client\RadarrApiClientInterface;
  */
 class RadarrApiFake extends BaseApiFake implements RadarrApiClientInterface
 {
-    public function movie(): MovieActions
+    public function movies(): MovieActions
     {
         return new MovieActions($this->getFakeClient());
     }
 
-    public function queue(): QueueActions
+    public function downloads(): DownloadActions
     {
-        return new QueueActions($this->getFakeClient());
+        return new DownloadActions($this->getFakeClient());
     }
 
     public function history(): HistoryActions

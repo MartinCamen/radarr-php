@@ -2,6 +2,8 @@
 
 namespace MartinCamen\Radarr\Data\Responses;
 
+use MartinCamen\ArrCore\ValueObject\ArrFileSize;
+
 final readonly class Movie
 {
     /**
@@ -126,6 +128,6 @@ final readonly class Movie
 
     public function getSizeOnDiskGb(): float
     {
-        return round($this->sizeOnDisk / 1024 / 1024 / 1024, 2);
+        return ArrFileSize::fromBytes($this->sizeOnDisk)->toGigabytes(precision: 2);
     }
 }

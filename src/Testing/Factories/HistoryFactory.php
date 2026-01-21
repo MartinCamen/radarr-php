@@ -6,11 +6,7 @@ use MartinCamen\ArrCore\Testing\Factories\ArrHistoryFactory;
 
 class HistoryFactory extends ArrHistoryFactory
 {
-    /**
-     * Get Radarr-specific default attributes.
-     *
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     protected static function getServiceDefaults(int $id): array
     {
         return [

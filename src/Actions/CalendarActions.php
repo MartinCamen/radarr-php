@@ -15,9 +15,9 @@ final readonly class CalendarActions extends CoreCalendarActions
      *
      * @link https://radarr.video/docs/api/#/Calendar/get_api_v3_calendar
      */
-    public function all(?CalendarOptions $options = null): MovieCollection
+    public function all(?CalendarOptions $calendarOptions = null): MovieCollection
     {
-        return MovieCollection::fromArray($this->getAll($options));
+        return MovieCollection::fromArray($this->getAll($calendarOptions));
     }
 
     /**

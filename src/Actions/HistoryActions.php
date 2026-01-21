@@ -20,18 +20,18 @@ final readonly class HistoryActions extends CoreHistoryActions
      * @link https://radarr.video/docs/api/#/History/get_api_v3_history
      */
     public function all(
-        ?PaginationOptions $pagination = null,
-        ?SortOptions $sort = null,
-        ?HistoryOptions $filters = null,
+        ?PaginationOptions $paginationOptions = null,
+        ?SortOptions $sortOptions = null,
+        ?HistoryOptions $historyOptions = null,
     ): HistoryPage {
-        $requestFilters = $filters?->toArray() ?? [];
+        $requestFilters = $historyOptions?->toArray() ?? [];
 
-        if (($eventType = $filters?->eventType) instanceof \MartinCamen\Radarr\Data\Enums\HistoryEventType) {
+        if (($eventType = $historyOptions?->eventType) instanceof \MartinCamen\Radarr\Data\Enums\HistoryEventType) {
             $requestFilters['eventType'] = $eventType->numericValue();
         }
 
         return HistoryPage::fromArray(
-            $this->getAll($pagination, $sort, $requestFilters),
+            $this->getAll($paginationOptions, $sortOptions, $requestFilters),
         );
     }
 
@@ -42,11 +42,11 @@ final readonly class HistoryActions extends CoreHistoryActions
      */
     public function since(
         DateTimeInterface $date,
-        ?HistoryOptions $filters = null,
+        ?HistoryOptions $historyOptions = null,
     ): array {
         return array_map(
             HistoryRecord::fromArray(...),
-            $this->getAllSince($date, $filters),
+            $this->getAllSince($date, $historyOptions),
         );
     }
 
@@ -59,11 +59,11 @@ final readonly class HistoryActions extends CoreHistoryActions
      */
     public function find(
         int $id,
-        ?HistoryOptions $filters = null,
+        ?HistoryOptions $historyOptions = null,
     ): array {
         $params = array_merge(
             ['movieId' => $id],
-            $filters?->toArray() ?? [],
+            $historyOptions?->toArray() ?? [],
         );
 
         $result = $this->client->get(HistoryEndpoint::Movie, $params);

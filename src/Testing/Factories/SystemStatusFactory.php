@@ -6,11 +6,7 @@ use MartinCamen\ArrCore\Testing\Factories\ArrSystemStatusFactory;
 
 class SystemStatusFactory extends ArrSystemStatusFactory
 {
-    /**
-     * Get Radarr-specific default attributes.
-     *
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     protected static function getServiceDefaults(): array
     {
         return [

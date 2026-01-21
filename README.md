@@ -1,11 +1,22 @@
 # Radarr PHP SDK
 
+> [!IMPORTANT]
+> This project is still being developed and breaking changes might occur even between patch versions.
+>
+> The aim is to follow semantic versioning as soon as possible.
+
 A PHP SDK for the Radarr REST API v3.
 
-Also available:
-- [PHP Sonarr integration](https://github.com/martincamen/sonarr-php)
-- [Laravel Radarr integration](https://github.com/martincamen/laravel-radarr)
-- [Laravel Sonarr integration](https://github.com/martincamen/laravel-sonarr)
+## Ecosystem
+
+| Package                                                                 | Description                        |
+|-------------------------------------------------------------------------|------------------------------------|
+| [radarr-php](https://github.com/martincamen/radarr-php)                 | PHP SDK for Radarr                 |
+| [sonarr-php](https://github.com/martincamen/sonarr-php)                 | PHP SDK for Sonarr                 |
+| [jellyseerr-php](https://github.com/martincamen/jellyseerr-php)         | PHP SDK for Jellyseerr             |
+| [laravel-radarr](https://github.com/martincamen/laravel-radarr)         | Laravel integration for Radarr     |
+| [laravel-sonarr](https://github.com/martincamen/laravel-sonarr)         | Laravel integration for Sonarr     |
+| [laravel-jellyseerr](https://github.com/martincamen/laravel-jellyseerr) | Laravel integration for Jellyseerr |
 
 ## Requirements
 
@@ -30,10 +41,13 @@ $radarr = Radarr::create(
 );
 
 // Get all downloads (queue items)
-$downloads = $radarr->downloads();
+$downloads = $radarr->downloads()->all();
 
 // Get all movies
-$movies = $radarr->movies();
+$movies = $radarr->movies()->all();
+
+// Get a specific movie
+$movie = $radarr->movies()->find(1);
 
 // Get system status
 $status = $radarr->system()->status();
@@ -47,42 +61,47 @@ For Laravel integration, use the [laravel-radarr](https://github.com/martincamen
 
 ### Downloads (Queue)
 
-Get active downloads using the unified `downloads()` method, which returns Core domain models compatible with other *arr services:
+Get active downloads using the `downloads()` action:
 
 ```php
 use MartinCamen\Radarr\Radarr;
 
 $radarr = Radarr::create('localhost', 7878, 'your-api-key');
 
-// Get all active downloads
-$downloads = $radarr->downloads();
+// Get all active downloads (paginated)
+$downloadPage = $radarr->downloads()->all();
 
-foreach ($downloads as $item) {
-    echo $item->name;
-    echo $item->progress->percentage() . '%';
+foreach ($downloadPage as $item) {
+    echo $item->title;
     echo $item->status->value;
-    echo $item->size->formatted();
+    echo $item->sizeLeft;
 }
 
-// Filter downloads by status
-$active = $downloads->active();
-$completed = $downloads->completed();
-$failed = $downloads->failed();
+// Get a specific download by ID
+$download = $radarr->downloads()->find(1);
 
-// Get total size and progress
-echo $downloads->totalSize()->formatted();
-echo $downloads->totalProgress()->percentage() . '%';
+// Get download status summary
+$status = $radarr->downloads()->status();
+echo "Total: {$status->totalCount}";
+echo "Unknown: {$status->unknownCount}";
+
+// Delete a download
+$radarr->downloads()->delete(1);
+
+// Bulk delete downloads
+$radarr->downloads()->bulkDelete([1, 2, 3]);
 ```
 
 ### Movies
 
 ```php
-use MartinCamen\ArrCore\Domain\Media\Movie;
+use MartinCamen\Radarr\Data\Responses\Movie;
+use MartinCamen\Radarr\Data\Responses\MovieCollection;
 use MartinCamen\Radarr\Radarr;
 
 // Get all movies
-/** @var Movie[] $movies */
-$movies = $radarr->movies();
+/** @var MovieCollection $movies */
+$movies = $radarr->movies()->all();
 
 foreach ($movies as $movie) {
     echo $movie->title;
@@ -93,13 +112,34 @@ foreach ($movies as $movie) {
 
 // Get a specific movie by ID
 /** @var Movie $movie */
-$movie = $radarr->movie(1);
+$movie = $radarr->movies()->find(1);
 
 echo $movie->title;
 echo $movie->overview;
+
+// Search for movies
+$results = $radarr->movies()->search('Inception');
+
+// Search by external IDs
+$movie = $radarr->movies()->searchByTmdb(27205);
+$movie = $radarr->movies()->searchByImdb('tt1375666');
+
+// Add a new movie
+$movie = $radarr->movies()->add([
+    'title'            => 'Inception',
+    'tmdbId'           => 27205,
+    'qualityProfileId' => 1,
+    'rootFolderPath'   => '/movies/',
+]);
+
+// Update a movie
+$movie = $radarr->movies()->update(1, ['monitored' => false]);
+
+// Delete a movie
+$radarr->movies()->delete(1);
 ```
 
-### System Status
+### System
 
 ```php
 use MartinCamen\ArrCore\Actions\SystemActions;
@@ -107,27 +147,29 @@ use MartinCamen\ArrCore\Actions\SystemActions;
 /** @var SystemActions $system */
 $system = $radarr->system();
 
-echo $system->status()->version;
+// Get system status
+$status = $system->status();
+echo $status->version;
+echo $status->osName;
 
-foreach ($system->health()->warnings() as $warning) {
+// Get system health
+$health = $system->health();
+foreach ($health->warnings() as $warning) {
     echo $warning->type . ': ' . $warning->message;
 }
-```
 
-### System Summary
-
-```php
-use MartinCamen\ArrCore\Domain\System\SystemSummary;
-
-/** @var SystemSummary $summary */
-$summary = $radarr->systemSummary();
-
-echo $summary->version;
-echo $summary->isHealthy ? 'Healthy' : 'Issues detected';
-
-foreach ($summary->healthIssues as $issue) {
-    echo $issue->type . ': ' . $issue->message;
+// Get disk space
+$diskSpace = $system->diskSpace();
+foreach ($diskSpace as $disk) {
+    echo $disk->path . ': ' . $disk->freeSpace;
 }
+
+// Get system tasks
+$tasks = $system->tasks();
+$task = $system->task(1);
+
+// Get backups
+$backups = $system->backups();
 ```
 
 ### Calendar
@@ -358,7 +400,7 @@ class MyTest extends TestCase
             'movies' => MovieFactory::makeMany(5),
         ]);
 
-        $movies = $fake->movies();
+        $movies = $fake->movies()->all();
 
         $this->assertCount(5, $movies);
         $fake->assertCalled('movies');
@@ -372,7 +414,7 @@ class MyTest extends TestCase
             'downloads' => DownloadFactory::makeMany(3),
         ]);
 
-        $downloads = $fake->downloads();
+        $downloads = $fake->downloads()->all();
 
         $this->assertCount(3, $downloads);
         $fake->assertCalled('downloads');
@@ -407,14 +449,17 @@ The SDK follows a layered architecture:
 ```
 Radarr (Public SDK)
   ↓
-RadarrApiClient (Internal API Client)
+Action Classes (MovieActions, DownloadActions, etc.)
+  ↓
+Endpoint Classes (MovieEndpoint, QueueEndpoint, etc.)
   ↓
 HTTP Client
 ```
 
-- **`Radarr`**: The public interface with unified terminology (`downloads()`, `movies()`) returning Core domain models
-- **`RadarrApiClient`**: Internal client using Radarr's native API terminology (`queue()`, `movie()`)
-- **Core Domain Models**: Shared types from `php-arr-core` for cross-service compatibility
+- **`Radarr`**: The public entry point returning action classes
+- **Action Classes**: Type-safe methods for each domain (`movies()->all()`, `downloads()->find(1)`)
+- **Endpoint Classes**: Low-level API calls using Radarr's native terminology
+- **Response Types**: Typed DTOs from the SDK (`Movie`, `DownloadPage`, etc.)
 
 ## License
 

@@ -10,13 +10,13 @@ use MartinCamen\Radarr\Data\Responses\MovieCollection;
 /** @link https://radarr.video/docs/api/#/Movie */
 final readonly class MovieActions
 {
-    public function __construct(private RestClientInterface $client) {}
+    public function __construct(private RestClientInterface $restClient) {}
 
     /** @link https://radarr.video/docs/api/#/Movie/get_api_v3_movie */
     public function all(): MovieCollection
     {
         return MovieCollection::fromArray(
-            $this->client->get(MovieEndpoint::All),
+            $this->restClient->get(MovieEndpoint::All),
         );
     }
 
@@ -24,7 +24,7 @@ final readonly class MovieActions
     public function find(int $id): Movie
     {
         return Movie::fromArray(
-            $this->client->get(MovieEndpoint::ById, ['id' => $id]),
+            $this->restClient->get(MovieEndpoint::ById, ['id' => $id]),
         );
     }
 
@@ -36,7 +36,7 @@ final readonly class MovieActions
     public function search(string $term): MovieCollection
     {
         return MovieCollection::fromArray(
-            $this->client->get(MovieEndpoint::Lookup, ['term' => $term]),
+            $this->restClient->get(MovieEndpoint::Lookup, ['term' => $term]),
         );
     }
 
@@ -44,7 +44,7 @@ final readonly class MovieActions
     public function searchByTmdb(int $tmdbId): Movie
     {
         return Movie::fromArray(
-            $this->client->get(MovieEndpoint::LookupTmdb, ['tmdbId' => $tmdbId]),
+            $this->restClient->get(MovieEndpoint::LookupTmdb, ['tmdbId' => $tmdbId]),
         );
     }
 
@@ -52,7 +52,7 @@ final readonly class MovieActions
     public function searchByImdb(string $imdbId): Movie
     {
         return Movie::fromArray(
-            $this->client->get(MovieEndpoint::LookupImdb, ['imdbId' => $imdbId]),
+            $this->restClient->get(MovieEndpoint::LookupImdb, ['imdbId' => $imdbId]),
         );
     }
 
@@ -66,7 +66,7 @@ final readonly class MovieActions
     public function add(array $movieData): Movie
     {
         return Movie::fromArray(
-            $this->client->post(MovieEndpoint::All, $movieData),
+            $this->restClient->post(MovieEndpoint::All, $movieData),
         );
     }
 
@@ -79,7 +79,7 @@ final readonly class MovieActions
      */
     public function update(int $id, array $movieData): Movie
     {
-        $result = $this->client->put(
+        $result = $this->restClient->put(
             MovieEndpoint::ById,
             array_merge(['id' => $id], $movieData),
         );
@@ -94,7 +94,7 @@ final readonly class MovieActions
      */
     public function delete(int $id, bool $deleteFiles = false, bool $addImportExclusion = false): void
     {
-        $this->client->delete(MovieEndpoint::ById, [
+        $this->restClient->delete(MovieEndpoint::ById, [
             'id'                 => $id,
             'deleteFiles'        => $deleteFiles,
             'addImportExclusion' => $addImportExclusion,

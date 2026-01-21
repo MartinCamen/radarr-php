@@ -13,14 +13,14 @@ use MartinCamen\ArrCore\Domain\System\SystemSummary;
 use MartinCamen\ArrCore\Enum\Service;
 use MartinCamen\ArrCore\Mapping\ServiceToCoreMapper;
 use MartinCamen\ArrCore\Mapping\StatusNormalizer;
+use MartinCamen\ArrCore\ValueObject\ArrFileSize;
 use MartinCamen\ArrCore\ValueObject\ArrId;
 use MartinCamen\ArrCore\ValueObject\Duration;
-use MartinCamen\ArrCore\ValueObject\FileSize;
 use MartinCamen\ArrCore\ValueObject\Progress;
+use MartinCamen\Radarr\Data\Responses\Download;
+use MartinCamen\Radarr\Data\Responses\DownloadPage;
 use MartinCamen\Radarr\Data\Responses\Movie as RadarrMovie;
 use MartinCamen\Radarr\Data\Responses\MovieCollection;
-use MartinCamen\Radarr\Data\Responses\QueuePage;
-use MartinCamen\Radarr\Data\Responses\QueueRecord;
 
 /**
  * Maps Radarr DTOs to php-arr-core domain models.
@@ -30,27 +30,25 @@ use MartinCamen\Radarr\Data\Responses\QueueRecord;
  */
 final class RadarrToCoreMapper extends ServiceToCoreMapper
 {
-    /**
-     * Map Radarr Movie DTO to Core Movie model.
-     */
-    public static function mapMovie(RadarrMovie $dto): Movie
+    /** Map Radarr Movie DTO to Core Movie model */
+    public static function mapMovie(RadarrMovie $radarrMovie): Movie
     {
         return new Movie(
-            id: ArrId::fromInt($dto->id),
-            title: $dto->title,
-            year: $dto->year,
-            status: StatusNormalizer::mediaFromRadarr($dto->status, $dto->hasFile),
-            monitored: $dto->monitored,
+            id: ArrId::fromInt($radarrMovie->id),
+            title: $radarrMovie->title,
+            year: $radarrMovie->year,
+            status: StatusNormalizer::mediaFromRadarr($radarrMovie->status, $radarrMovie->hasFile),
+            monitored: $radarrMovie->monitored,
             source: Service::Radarr,
-            sizeOnDisk: FileSize::fromBytes($dto->sizeOnDisk),
-            path: $dto->path,
-            overview: $dto->overview,
-            posterUrl: self::extractImage($dto->images, 'poster'),
-            fanartUrl: self::extractImage($dto->images, 'fanart'),
-            imdbId: $dto->imdbId,
-            tmdbId: $dto->tmdbId,
-            runtime: $dto->runtime !== null ? Duration::fromMinutes($dto->runtime) : null,
-            hasFile: $dto->hasFile,
+            sizeOnDisk: ArrFileSize::fromBytes($radarrMovie->sizeOnDisk),
+            path: $radarrMovie->path,
+            overview: $radarrMovie->overview,
+            posterUrl: self::extractImage($radarrMovie->images, 'poster'),
+            fanartUrl: self::extractImage($radarrMovie->images, 'fanart'),
+            imdbId: $radarrMovie->imdbId,
+            tmdbId: $radarrMovie->tmdbId,
+            runtime: $radarrMovie->runtime !== null ? Duration::fromMinutes($radarrMovie->runtime) : null,
+            hasFile: $radarrMovie->hasFile,
         );
     }
 
@@ -59,53 +57,49 @@ final class RadarrToCoreMapper extends ServiceToCoreMapper
      *
      * @return array<int|string, Movie>
      */
-    public static function mapMovieCollection(MovieCollection $collection): array
+    public static function mapMovieCollection(MovieCollection $movieCollection): array
     {
         return array_map(
             self::mapMovie(...),
-            $collection->all(),
+            $movieCollection->all(),
         );
     }
 
-    /**
-     * Map Radarr Queue Record to Core DownloadItem.
-     */
-    public static function mapQueueRecord(QueueRecord $dto): DownloadItem
+    /** Map Radarr Download to Core DownloadItem */
+    public static function mapDownload(Download $download): DownloadItem
     {
-        $size = $dto->size;
-        $sizeLeft = $dto->sizeleft;
-        $progress = $size > 0 ? (($size - $sizeLeft) / $size) * 100 : 0;
+        $size = $download->size;
+        $sizeLeft = $download->sizeLeft;
+        $progress = (int) $download->getProgress();
 
         return new DownloadItem(
-            id: ArrId::fromInt($dto->id),
-            name: $dto->title ?? 'Unknown',
-            size: FileSize::fromBytes((int) $size),
-            sizeRemaining: FileSize::fromBytes((int) $sizeLeft),
+            id: ArrId::fromInt($download->id),
+            name: $download->title ?? 'Unknown',
+            size: ArrFileSize::fromBytes((int) $size),
+            sizeRemaining: ArrFileSize::fromBytes((int) $sizeLeft),
             progress: Progress::fromPercentage($progress),
             status: StatusNormalizer::downloadFromRadarrQueue(
-                $dto->status,
-                $dto->trackedDownloadStatus,
-                $dto->trackedDownloadState,
+                $download->status,
+                $download->trackedDownloadStatus,
+                $download->trackedDownloadState,
             ),
             source: Service::Radarr,
-            eta: $dto->timeleft !== null ? self::parseTimeSpan($dto->timeleft) : null,
-            downloadClient: $dto->downloadClient,
-            indexer: $dto->indexer,
-            outputPath: $dto->outputPath,
-            mediaId: $dto->movieId !== null ? ArrId::fromInt($dto->movieId) : null,
-            mediaTitle: $dto->title,
-            errorMessage: $dto->errorMessage,
+            eta: $download->timeLeft !== null ? self::parseTimeSpan($download->timeLeft) : null,
+            downloadClient: $download->downloadClient,
+            indexer: $download->indexer,
+            outputPath: $download->outputPath,
+            mediaId: $download->movieId !== null ? ArrId::fromInt($download->movieId) : null,
+            mediaTitle: $download->title,
+            errorMessage: $download->errorMessage,
         );
     }
 
-    /**
-     * Map Radarr Queue Page to Core DownloadItemCollection.
-     */
-    public static function mapQueuePage(QueuePage $dto): DownloadItemCollection
+    /** Map Radarr DownloadPage to Core DownloadItemCollection */
+    public static function mapDownloadPage(DownloadPage $downloadPage): DownloadItemCollection
     {
         $items = array_map(
-            self::mapQueueRecord(...),
-            $dto->records(),
+            self::mapDownload(...),
+            $downloadPage->all(),
         );
 
         return new DownloadItemCollection(...$items);
@@ -116,8 +110,8 @@ final class RadarrToCoreMapper extends ServiceToCoreMapper
      *
      * @param array<int, HealthCheck> $healthChecks
      */
-    public static function mapSystemSummary(DownloadServiceSystemSummary $dto, array $healthChecks = []): SystemSummary
+    public static function mapSystemSummary(DownloadServiceSystemSummary $downloadServiceSystemSummary, array $healthChecks = []): SystemSummary
     {
-        return self::mapToSystemSummary(Service::Radarr, $dto, $healthChecks);
+        return self::mapToSystemSummary(Service::Radarr, $downloadServiceSystemSummary, $healthChecks);
     }
 }

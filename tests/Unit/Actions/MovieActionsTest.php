@@ -23,10 +23,10 @@ class MovieActionsTest extends TestCase
             ->willReturn(MovieFactory::makeMany(3));
 
         $movieActions = new MovieActions($client);
-        $movies = $movieActions->all();
+        $movieCollection = $movieActions->all();
 
-        $this->assertInstanceOf(MovieCollection::class, $movies);
-        $this->assertCount(3, $movies);
+        $this->assertInstanceOf(MovieCollection::class, $movieCollection);
+        $this->assertCount(3, $movieCollection);
     }
 
     #[Test]
@@ -55,10 +55,10 @@ class MovieActionsTest extends TestCase
             ->willReturn(MovieFactory::makeMany(5));
 
         $movieActions = new MovieActions($client);
-        $movies = $movieActions->search('inception');
+        $movieCollection = $movieActions->search('inception');
 
-        $this->assertInstanceOf(MovieCollection::class, $movies);
-        $this->assertCount(5, $movies);
+        $this->assertInstanceOf(MovieCollection::class, $movieCollection);
+        $this->assertCount(5, $movieCollection);
     }
 
     #[Test]

@@ -31,20 +31,20 @@ final readonly class HistoryOptions implements HistoryRequestOptions
 
     /** @param array<int, int>|null $movieIds */
     public static function make(
-        ?HistoryEventType $eventType = null,
+        ?HistoryEventType $historyEventType = null,
         ?bool $includeMovie = null,
         ?array $movieIds = null,
     ): self {
         return new self(
-            eventType: $eventType,
+            eventType: $historyEventType,
             includeMovie: $includeMovie,
             movieIds: $movieIds,
         );
     }
 
-    public function withEventType(HistoryEventType $eventType): self
+    public function withEventType(HistoryEventType $historyEventType): self
     {
-        return new self($eventType, $this->includeMovie, $this->movieIds);
+        return new self($historyEventType, $this->includeMovie, $this->movieIds);
     }
 
     public function withIncludeMovie(bool $includeMovie): self

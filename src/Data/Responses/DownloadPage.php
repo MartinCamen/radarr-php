@@ -6,10 +6,10 @@ namespace MartinCamen\Radarr\Data\Responses;
 
 use MartinCamen\ArrCore\Data\Responses\PaginatedResponse;
 
-/** @extends PaginatedResponse<HistoryRecord> */
-final class HistoryPage extends PaginatedResponse
+/** @extends PaginatedResponse<Download> */
+final class DownloadPage extends PaginatedResponse
 {
-    /** @param array<int, HistoryRecord> $records */
+    /** @param array<int, Download> $records */
     public function __construct(
         int $page,
         int $pageSize,
@@ -27,13 +27,13 @@ final class HistoryPage extends PaginatedResponse
             pageSize: $data['pageSize'] ?? 10,
             totalRecords: $data['totalRecords'] ?? 0,
             records: array_map(
-                HistoryRecord::fromArray(...),
+                Download::fromArray(...),
                 $data['records'] ?? [],
             ),
         );
     }
 
-    /** @return array<int, HistoryRecord> */
+    /** @return array<int, Download> */
     public function all(): array
     {
         return $this->records;
@@ -47,7 +47,7 @@ final class HistoryPage extends PaginatedResponse
             'pageSize'     => $this->pageSize(),
             'totalRecords' => $this->total(),
             'records'      => array_map(
-                static fn(HistoryRecord $historyRecord): array => $historyRecord->toArray(),
+                static fn(Download $download): array => $download->toArray(),
                 $this->records,
             ),
         ];
