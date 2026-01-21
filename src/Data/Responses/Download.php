@@ -2,10 +2,18 @@
 
 namespace MartinCamen\Radarr\Data\Responses;
 
-use MartinCamen\ArrCore\ValueObject\ArrFileSize;
+use MartinCamen\ArrCore\Concerns\DownloadHasSizeWithSizeLeft;
+use MartinCamen\ArrCore\Concerns\DownloadHasTrackedDownloadState;
+use MartinCamen\ArrCore\Concerns\DownloadHasTrackedDownloadStatus;
+use MartinCamen\ArrCore\Enum\TrackedDownloadState;
+use MartinCamen\ArrCore\Enum\TrackedDownloadStatus;
 
 final readonly class Download
 {
+    use DownloadHasSizeWithSizeLeft;
+    use DownloadHasTrackedDownloadState;
+    use DownloadHasTrackedDownloadStatus;
+
     /**
      * @param array<string, mixed>|null $quality
      * @param array<string, mixed>|null $customFormats
@@ -41,8 +49,8 @@ final readonly class Download
             movieId: $data['movieId'] ?? null,
             title: $data['title'] ?? null,
             status: $data['status'] ?? 'unknown',
-            trackedDownloadStatus: $data['trackedDownloadStatus'] ?? 'unknown',
-            trackedDownloadState: $data['trackedDownloadState'] ?? 'unknown',
+            trackedDownloadStatus: $data['trackedDownloadStatus'] ?? TrackedDownloadStatus::Unknown->value,
+            trackedDownloadState: $data['trackedDownloadState'] ?? TrackedDownloadState::Unknown->value,
             quality: $data['quality'] ?? null,
             size: (float) ($data['size'] ?? 0),
             sizeLeft: (float) ($data['sizeleft'] ?? 0),
@@ -83,36 +91,5 @@ final readonly class Download
             'custom_formats'            => $this->customFormats,
             'error_message'             => $this->errorMessage,
         ];
-    }
-
-    public function getProgress(): float
-    {
-        if ($this->size === 0.0) {
-            return 0.0;
-        }
-
-        return round((($this->size - $this->sizeLeft) / $this->size) * 100, 2);
-    }
-
-    public function getSizeGb(): float
-    {
-        return ArrFileSize::fromBytes($this->size)->toGigabytes(precision: 2);
-    }
-
-    public function getSizeLeftGb(): float
-    {
-        return ArrFileSize::fromBytes($this->sizeLeft)->toGigabytes(precision: 2);
-    }
-
-    public function isCompleted(): bool
-    {
-        return $this->trackedDownloadState === 'importPending'
-            || $this->trackedDownloadState === 'imported';
-    }
-
-    public function hasError(): bool
-    {
-        return $this->trackedDownloadStatus === 'warning'
-            || $this->trackedDownloadStatus === 'error';
     }
 }
