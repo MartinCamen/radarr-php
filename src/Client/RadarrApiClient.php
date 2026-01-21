@@ -9,9 +9,9 @@ use MartinCamen\ArrCore\Actions\WantedActions;
 use MartinCamen\ArrCore\Client\RestClientInterface;
 use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Actions\CommandActions;
+use MartinCamen\Radarr\Actions\DownloadActions;
 use MartinCamen\Radarr\Actions\HistoryActions;
 use MartinCamen\Radarr\Actions\MovieActions;
-use MartinCamen\Radarr\Actions\QueueActions;
 use MartinCamen\Radarr\Config\RadarrConfiguration;
 
 /**
@@ -31,7 +31,7 @@ class RadarrApiClient implements RadarrApiClientInterface
 {
     protected RestClientInterface $client;
     protected ?MovieActions $movieActions = null;
-    protected ?QueueActions $queueActions = null;
+    protected ?DownloadActions $downloadActions = null;
     protected ?HistoryActions $historyActions = null;
     protected ?CalendarActions $calendarActions = null;
     protected ?SystemActions $systemActions = null;
@@ -48,7 +48,7 @@ class RadarrApiClient implements RadarrApiClientInterface
         ?RestClientInterface $restClient = null,
         string $apiVersion = 'v3',
     ) {
-        $config = new RadarrConfiguration(
+        $radarrConfiguration = new RadarrConfiguration(
             host: $host,
             port: $port,
             apiKey: $apiKey,
@@ -58,30 +58,30 @@ class RadarrApiClient implements RadarrApiClientInterface
             apiVersion: $apiVersion,
         );
 
-        $this->client = $restClient ?? new RadarrRestClient($config);
+        $this->client = $restClient ?? new RadarrRestClient($radarrConfiguration);
     }
 
-    public static function make(RadarrConfiguration $config): self
+    public static function make(RadarrConfiguration $radarrConfiguration): self
     {
         return new self(
-            host: $config->host,
-            port: $config->port,
-            apiKey: $config->apiKey,
-            useHttps: $config->useHttps,
-            timeout: $config->timeout,
-            urlBase: $config->urlBase,
-            apiVersion: $config->apiVersion,
+            host: $radarrConfiguration->host,
+            port: $radarrConfiguration->port,
+            apiKey: $radarrConfiguration->apiKey,
+            useHttps: $radarrConfiguration->useHttps,
+            timeout: $radarrConfiguration->timeout,
+            urlBase: $radarrConfiguration->urlBase,
+            apiVersion: $radarrConfiguration->apiVersion,
         );
     }
 
-    public function movie(): MovieActions
+    public function movies(): MovieActions
     {
         return $this->movieActions ??= new MovieActions($this->client);
     }
 
-    public function queue(): QueueActions
+    public function downloads(): DownloadActions
     {
-        return $this->queueActions ??= new QueueActions($this->client);
+        return $this->downloadActions ??= new DownloadActions($this->client);
     }
 
     public function history(): HistoryActions

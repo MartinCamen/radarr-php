@@ -34,30 +34,30 @@ class MovieTest extends TestCase
     #[Test]
     public function itCanCheckIfReleased(): void
     {
-        $released = Movie::fromArray(MovieFactory::make(1, ['status' => 'released']));
+        $movie = Movie::fromArray(MovieFactory::make(1, ['status' => 'released']));
         $announced = Movie::fromArray(MovieFactory::make(2, ['status' => 'announced']));
 
-        $this->assertTrue($released->isReleased());
+        $this->assertTrue($movie->isReleased());
         $this->assertFalse($announced->isReleased());
     }
 
     #[Test]
     public function itCanCheckIfDownloaded(): void
     {
-        $downloaded = Movie::fromArray(MovieFactory::makeDownloaded(1));
+        $movie = Movie::fromArray(MovieFactory::makeDownloaded(1));
         $notDownloaded = Movie::fromArray(MovieFactory::make(2));
 
-        $this->assertTrue($downloaded->isDownloaded());
+        $this->assertTrue($movie->isDownloaded());
         $this->assertFalse($notDownloaded->isDownloaded());
     }
 
     #[Test]
     public function itCanCheckIfMonitored(): void
     {
-        $monitored = Movie::fromArray(MovieFactory::make(1, ['monitored' => true]));
+        $movie = Movie::fromArray(MovieFactory::make(1, ['monitored' => true]));
         $unmonitored = Movie::fromArray(MovieFactory::makeUnmonitored(2));
 
-        $this->assertTrue($monitored->isMonitored());
+        $this->assertTrue($movie->isMonitored());
         $this->assertFalse($unmonitored->isMonitored());
     }
 

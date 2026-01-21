@@ -8,9 +8,9 @@ use MartinCamen\ArrCore\Actions\SystemActions;
 use MartinCamen\ArrCore\Actions\WantedActions;
 use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Actions\CommandActions;
+use MartinCamen\Radarr\Actions\DownloadActions;
 use MartinCamen\Radarr\Actions\HistoryActions;
 use MartinCamen\Radarr\Actions\MovieActions;
-use MartinCamen\Radarr\Actions\QueueActions;
 
 /**
  * Interface for low-level Radarr API client.
@@ -19,9 +19,9 @@ use MartinCamen\Radarr\Actions\QueueActions;
  */
 interface RadarrApiClientInterface
 {
-    public function movie(): MovieActions;
+    public function movies(): MovieActions;
 
-    public function queue(): QueueActions;
+    public function downloads(): DownloadActions;
 
     public function history(): HistoryActions;
 

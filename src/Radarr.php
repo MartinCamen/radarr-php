@@ -6,16 +6,14 @@ namespace MartinCamen\Radarr;
 
 use MartinCamen\ArrCore\Actions\SystemActions;
 use MartinCamen\ArrCore\Actions\WantedActions;
-use MartinCamen\ArrCore\Domain\Download\DownloadItemCollection;
-use MartinCamen\ArrCore\Domain\Media\Movie;
-use MartinCamen\ArrCore\Domain\System\SystemSummary;
 use MartinCamen\Radarr\Actions\CalendarActions;
 use MartinCamen\Radarr\Actions\CommandActions;
+use MartinCamen\Radarr\Actions\DownloadActions;
 use MartinCamen\Radarr\Actions\HistoryActions;
+use MartinCamen\Radarr\Actions\MovieActions;
 use MartinCamen\Radarr\Client\RadarrApiClient;
 use MartinCamen\Radarr\Client\RadarrApiClientInterface;
 use MartinCamen\Radarr\Config\RadarrConfiguration;
-use MartinCamen\Radarr\Mapper\RadarrToCoreMapper;
 
 /**
  * Radarr SDK client - the primary interface for interacting with Radarr.
@@ -31,11 +29,13 @@ use MartinCamen\Radarr\Mapper\RadarrToCoreMapper;
  *     apiKey: 'your-api-key',
  * );
  *
- * // Get all downloads (queue items)
- * $downloads = $radarr->downloads();
- *
  * // Get all movies
- * $movies = $radarr->movies();
+ * $movies = $radarr->movies()->all();
+ * $movie = $radarr->movies()->find(123);
+ *
+ * // Get all downloads
+ * $downloads = $radarr->downloads()->all();
+ * $status = $radarr->downloads()->status();
  *
  * // Get system status
  * $status = $radarr->system()->status();
@@ -43,11 +43,9 @@ use MartinCamen\Radarr\Mapper\RadarrToCoreMapper;
  */
 class Radarr implements RadarrInterface
 {
-    public function __construct(private readonly RadarrApiClientInterface $apiClient) {}
+    public function __construct(private readonly RadarrApiClientInterface $radarrApiClient) {}
 
-    /**
-     * Create a new Radarr instance from connection parameters.
-     */
+    /** Create a new Radarr instance from connection parameters */
     public static function create(
         string $host = 'localhost',
         int $port = 7878,
@@ -68,47 +66,30 @@ class Radarr implements RadarrInterface
         );
     }
 
-    /**
-     * Create a new Radarr instance from a configuration object.
-     */
-    public static function make(RadarrConfiguration $config): self
+    /** Create a new Radarr instance from a configuration object */
+    public static function make(RadarrConfiguration $radarrConfiguration): self
     {
-        return new self(RadarrApiClient::make($config));
+        return new self(RadarrApiClient::make($radarrConfiguration));
     }
 
     /**
-     * Get all active downloads (queue items).
+     * Access movie functionality.
      *
-     * Returns a collection of download items mapped to Core domain models,
-     * providing a unified interface across all *arr services.
+     * Provides access to list, search, add, update, and delete movies.
      */
-    public function downloads(): DownloadItemCollection
+    public function movies(): MovieActions
     {
-        $queue = $this->apiClient->queue()->all();
-
-        return RadarrToCoreMapper::mapQueuePage($queue);
+        return $this->radarrApiClient->movies();
     }
 
     /**
-     * Get all movies.
+     * Access download functionality (queue items).
      *
-     * @return array<int|string, Movie>
+     * Provides access to view and manage active downloads.
      */
-    public function movies(): array
+    public function downloads(): DownloadActions
     {
-        $movies = $this->apiClient->movie()->all();
-
-        return RadarrToCoreMapper::mapMovieCollection($movies);
-    }
-
-    /**
-     * Get a single movie by ID.
-     */
-    public function movie(int $id): Movie
-    {
-        $movie = $this->apiClient->movie()->find($id);
-
-        return RadarrToCoreMapper::mapMovie($movie);
+        return $this->radarrApiClient->downloads();
     }
 
     /**
@@ -118,18 +99,7 @@ class Radarr implements RadarrInterface
      */
     public function system(): SystemActions
     {
-        return $this->apiClient->system();
-    }
-
-    /**
-     * Get system status including health checks.
-     */
-    public function systemSummary(): SystemSummary
-    {
-        $status = $this->apiClient->system()->status();
-        $health = $this->apiClient->system()->health();
-
-        return RadarrToCoreMapper::mapSystemSummary($status, $health->all());
+        return $this->radarrApiClient->system();
     }
 
     /**
@@ -139,7 +109,7 @@ class Radarr implements RadarrInterface
      */
     public function calendar(): CalendarActions
     {
-        return $this->apiClient->calendar();
+        return $this->radarrApiClient->calendar();
     }
 
     /**
@@ -149,7 +119,7 @@ class Radarr implements RadarrInterface
      */
     public function history(): HistoryActions
     {
-        return $this->apiClient->history();
+        return $this->radarrApiClient->history();
     }
 
     /**
@@ -159,7 +129,7 @@ class Radarr implements RadarrInterface
      */
     public function wanted(): WantedActions
     {
-        return $this->apiClient->wanted();
+        return $this->radarrApiClient->wanted();
     }
 
     /**
@@ -169,7 +139,7 @@ class Radarr implements RadarrInterface
      */
     public function command(): CommandActions
     {
-        return $this->apiClient->command();
+        return $this->radarrApiClient->command();
     }
 
     /**
@@ -180,15 +150,15 @@ class Radarr implements RadarrInterface
      *
      * @example
      * ```php
-     * // Access the raw queue API with full options
-     * $queuePage = $radarr->api()->queue()->all($pagination, $sort, $filters);
+     * // Access the raw downloads API with full options
+     * $downloadPage = $radarr->api()->downloads()->all($pagination, $sort, $filters);
      *
      * // Add a movie using the raw API
-     * $radarr->api()->movie()->add($movieData);
+     * $radarr->api()->movies()->add($movieData);
      * ```
      */
     public function api(): RadarrApiClientInterface
     {
-        return $this->apiClient;
+        return $this->radarrApiClient;
     }
 }

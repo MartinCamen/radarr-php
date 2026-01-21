@@ -43,9 +43,7 @@ class MovieFactory
         ], $overrides);
     }
 
-    /**
-     * @return array<int, array<string, mixed>>
-     */
+    /** @return array<int, array<string, mixed>> */
     public static function makeMany(int $count = 5): array
     {
         $movies = [];

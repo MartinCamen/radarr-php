@@ -66,7 +66,7 @@ class SystemActionsTest extends TestCase
 
         $this->assertInstanceOf(DiskSpaceCollection::class, $diskSpace);
         $this->assertCount(1, $diskSpace);
-        $this->assertEquals(500000000000, $diskSpace->totalFreeSpace());
+        $this->assertEquals(500000000000, $diskSpace->totalFreeSpace()->toBytes());
     }
 
     #[Test]

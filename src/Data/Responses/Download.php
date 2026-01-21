@@ -2,7 +2,9 @@
 
 namespace MartinCamen\Radarr\Data\Responses;
 
-final readonly class QueueRecord
+use MartinCamen\ArrCore\ValueObject\ArrFileSize;
+
+final readonly class Download
 {
     /**
      * @param array<string, mixed>|null $quality
@@ -18,8 +20,8 @@ final readonly class QueueRecord
         public string $trackedDownloadState,
         public ?array $quality,
         public float $size,
-        public float $sizeleft,
-        public ?string $timeleft,
+        public float $sizeLeft,
+        public ?string $timeLeft,
         public ?string $estimatedCompletionTime,
         public string $downloadClient,
         public string $downloadId,
@@ -43,8 +45,8 @@ final readonly class QueueRecord
             trackedDownloadState: $data['trackedDownloadState'] ?? 'unknown',
             quality: $data['quality'] ?? null,
             size: (float) ($data['size'] ?? 0),
-            sizeleft: (float) ($data['sizeleft'] ?? 0),
-            timeleft: $data['timeleft'] ?? null,
+            sizeLeft: (float) ($data['sizeleft'] ?? 0),
+            timeLeft: $data['timeleft'] ?? null,
             estimatedCompletionTime: $data['estimatedCompletionTime'] ?? null,
             downloadClient: $data['downloadClient'] ?? '',
             downloadId: $data['downloadId'] ?? '',
@@ -69,8 +71,8 @@ final readonly class QueueRecord
             'tracked_download_state'    => $this->trackedDownloadState,
             'quality'                   => $this->quality,
             'size'                      => $this->size,
-            'sizeleft'                  => $this->sizeleft,
-            'timeleft'                  => $this->timeleft,
+            'sizeleft'                  => $this->sizeLeft,
+            'timeleft'                  => $this->timeLeft,
             'estimated_completion_time' => $this->estimatedCompletionTime,
             'download_client'           => $this->downloadClient,
             'download_id'               => $this->downloadId,
@@ -89,17 +91,17 @@ final readonly class QueueRecord
             return 0.0;
         }
 
-        return round((($this->size - $this->sizeleft) / $this->size) * 100, 2);
+        return round((($this->size - $this->sizeLeft) / $this->size) * 100, 2);
     }
 
     public function getSizeGb(): float
     {
-        return round($this->size / 1024 / 1024 / 1024, 2);
+        return ArrFileSize::fromBytes($this->size)->toGigabytes(precision: 2);
     }
 
-    public function getSizeleftGb(): float
+    public function getSizeLeftGb(): float
     {
-        return round($this->sizeleft / 1024 / 1024 / 1024, 2);
+        return ArrFileSize::fromBytes($this->sizeLeft)->toGigabytes(precision: 2);
     }
 
     public function isCompleted(): bool

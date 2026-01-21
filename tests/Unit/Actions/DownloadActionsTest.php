@@ -7,18 +7,18 @@ use MartinCamen\ArrCore\Data\Enums\QueueEndpoint;
 use MartinCamen\ArrCore\Data\Enums\SortDirection;
 use MartinCamen\ArrCore\Data\Options\PaginationOptions;
 use MartinCamen\ArrCore\Data\Options\SortOptions;
-use MartinCamen\ArrCore\Data\Responses\QueueStatus;
-use MartinCamen\Radarr\Actions\QueueActions;
-use MartinCamen\Radarr\Data\Responses\QueuePage;
-use MartinCamen\Radarr\Data\Responses\QueueRecord;
+use MartinCamen\ArrCore\Data\Responses\DownloadStatus;
+use MartinCamen\Radarr\Actions\DownloadActions;
+use MartinCamen\Radarr\Data\Responses\Download;
+use MartinCamen\Radarr\Data\Responses\DownloadPage;
 use MartinCamen\Radarr\Testing\Factories\DownloadFactory;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class QueueActionsTest extends TestCase
+class DownloadActionsTest extends TestCase
 {
     #[Test]
-    public function itCanGetPaginatedQueue(): void
+    public function itCanGetPaginatedDownloads(): void
     {
         $client = $this->createMock(RestClientInterface::class);
         $client->expects($this->once())
@@ -29,15 +29,15 @@ class QueueActionsTest extends TestCase
             ])
             ->willReturn(DownloadFactory::makePaginatedResponse(3));
 
-        $queueActions = new QueueActions($client);
-        $queue = $queueActions->all();
+        $downloadActions = new DownloadActions($client);
+        $downloadPage = $downloadActions->all();
 
-        $this->assertInstanceOf(QueuePage::class, $queue);
-        $this->assertCount(3, $queue);
+        $this->assertInstanceOf(DownloadPage::class, $downloadPage);
+        $this->assertCount(3, $downloadPage);
     }
 
     #[Test]
-    public function itCanGetQueueWithSorting(): void
+    public function itCanGetDownloadsWithSorting(): void
     {
         $client = $this->createMock(RestClientInterface::class);
         $client->expects($this->once())
@@ -50,17 +50,17 @@ class QueueActionsTest extends TestCase
             ])
             ->willReturn(DownloadFactory::makePaginatedResponse(2, pageSize: 10));
 
-        $queueActions = new QueueActions($client);
-        $queue = $queueActions->all(
+        $downloadActions = new DownloadActions($client);
+        $downloadPage = $downloadActions->all(
             new PaginationOptions(pageSize: 10),
             SortOptions::by('timeleft', SortDirection::Ascending),
         );
 
-        $this->assertInstanceOf(QueuePage::class, $queue);
+        $this->assertInstanceOf(DownloadPage::class, $downloadPage);
     }
 
     #[Test]
-    public function itCanGetQueueRecordById(): void
+    public function itCanGetDownloadById(): void
     {
         $client = $this->createMock(RestClientInterface::class);
         $client->expects($this->once())
@@ -68,15 +68,15 @@ class QueueActionsTest extends TestCase
             ->with(QueueEndpoint::ById, ['id' => 123])
             ->willReturn(DownloadFactory::make(123));
 
-        $queueActions = new QueueActions($client);
-        $record = $queueActions->find(123);
+        $downloadActions = new DownloadActions($client);
+        $download = $downloadActions->find(123);
 
-        $this->assertInstanceOf(QueueRecord::class, $record);
-        $this->assertEquals(123, $record->id);
+        $this->assertInstanceOf(Download::class, $download);
+        $this->assertEquals(123, $download->id);
     }
 
     #[Test]
-    public function itCanGetQueueStatus(): void
+    public function itCanGetDownloadStatus(): void
     {
         $client = $this->createMock(RestClientInterface::class);
         $client->expects($this->once())
@@ -92,16 +92,16 @@ class QueueActionsTest extends TestCase
                 'unknownWarnings' => false,
             ]);
 
-        $queueActions = new QueueActions($client);
-        $status = $queueActions->status();
+        $downloadActions = new DownloadActions($client);
+        $status = $downloadActions->status();
 
-        $this->assertInstanceOf(QueueStatus::class, $status);
+        $this->assertInstanceOf(DownloadStatus::class, $status);
         $this->assertEquals(5, $status->totalCount);
         $this->assertFalse($status->hasIssues());
     }
 
     #[Test]
-    public function itCanDeleteQueueItem(): void
+    public function itCanDeleteDownload(): void
     {
         $client = $this->createMock(RestClientInterface::class);
         $client->expects($this->once())
@@ -115,15 +115,15 @@ class QueueActionsTest extends TestCase
             ])
             ->willReturn(null);
 
-        $queueActions = new QueueActions($client);
-        $queueActions->delete(123, blocklist: true);
+        $downloadActions = new DownloadActions($client);
+        $downloadActions->delete(123, blocklist: true);
 
         // No exception means success
         $this->addToAssertionCount(1);
     }
 
     #[Test]
-    public function itCanBulkDeleteQueueItems(): void
+    public function itCanBulkDeleteDownloads(): void
     {
         $client = $this->createMock(RestClientInterface::class);
         $client->expects($this->once())
@@ -137,8 +137,8 @@ class QueueActionsTest extends TestCase
             ])
             ->willReturn(null);
 
-        $queueActions = new QueueActions($client);
-        $queueActions->bulkDelete([1, 2, 3]);
+        $downloadActions = new DownloadActions($client);
+        $downloadActions->bulkDelete([1, 2, 3]);
 
         // No exception means success
         $this->addToAssertionCount(1);
